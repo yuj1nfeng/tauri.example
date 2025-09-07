@@ -1,9 +1,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
-export const api_path = 'video.all';
-export const method = 'post';
-export const app = async (ctx) => {
+export default async (ctx) => {
     const body = await ctx.req.json();
     const { input, extensions = 'mp4,mov,avi,flv,wmv,mpg,mpeg,mkv,webm,3gp,flv,ts,mts,rmvb' } = body;
     const exts = extensions.split(',').map((ext) => ext.startsWith('.') ? ext.toLowerCase() : `.${ext.toLowerCase()}`);

@@ -3,6 +3,17 @@
 const pool = [];
 
 
+async function test(socket) {
+
+    while (true) {
+
+        await new Promise((resolve) => setTimeout(resolve, 5000));
+        const pack = { type: 'success', data: 'test' };
+        socket.send(JSON.stringify(pack));
+    }
+
+}
+
 function onMessage(event, socket) {
     console.log('message: ' + event.data);
     // socket.send('Server: ' + event.data);
@@ -19,6 +30,8 @@ function onOpen(event, socket) {
     pool.push(socket);
     const pack = { type: 'connected', data: '服务器连接成功' };
     socket.send(JSON.stringify(pack));
+    //connected
+    test(socket);
 }
 
 

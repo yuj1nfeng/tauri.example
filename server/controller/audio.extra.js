@@ -3,10 +3,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import socket from '../socket.js';
 import consts from '../../consts.js';
-export const api_path = 'audio.extra';
-export const method = 'post';
-
-export const app = async (ctx) => {
+export default async (ctx) => {
     const body = await ctx.req.json();
     const { videos, output_dir, audio_output_fmt, audio_codec, audio_bit_rate } = body;
 

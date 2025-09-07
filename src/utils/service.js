@@ -1,5 +1,5 @@
 
-const base_url = 'http://127.0.0.1:3000/api';
+const base_url = 'http://localhost:3000';
 
 const getVideoMeta = async (input) => {
     const req_url = `${base_url}/video.meta`;
