@@ -1,43 +1,54 @@
 {
-  "name": "tauri-app",
-  "private": true,
-  "version": "0.1.0",
-  "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
-    "preview": "vite preview",
-    "tauri": "tauri",
-    "tauri.dev": "tauri dev",
-    "tauri.build": "tauri build"
-  },
-  "dependencies": {
-    "@arco-design/web-react": "^2.66.5",
-    "@douyinfe/semi-ui": "^2.86.0",
-    "@radix-ui/react-slot": "^1.2.3",
-    "@tailwindcss/vite": "^4.1.13",
-    "@tauri-apps/api": "^2.8.0",
-    "@tauri-apps/plugin-dialog": "~2.4.0",
-    "@tauri-apps/plugin-fs": "~2.4.2",
-    "@tauri-apps/plugin-opener": "^2.5.0",
-    "button": "^1.1.1",
-    "class-variance-authority": "^0.7.1",
-    "clsx": "^2.1.1",
-    "lucide-react": "^0.542.0",
-    "react": "^18.3.0",
-    "react-dom": "^18.3.0",
-    "tailwind-merge": "^3.3.1",
-    "tailwindcss": "^4.1.13"
-  },
-  "devDependencies": {
-    "@tauri-apps/cli": "^2.8.4",
-    "@types/node": "^24.3.1",
-    "@types/react": "^19.1.12",
-    "@types/react-dom": "^19.1.9",
-    "@vitejs/plugin-react": "^4.7.0",
-    "prettier": "^3.6.2",
-    "tw-animate-css": "^1.3.8",
-    "typescript": "~5.8.3",
-    "vite": "^7.1.4"
-  }
+    "name": "tauri-app",
+    "private": true,
+    "version": "0.1.0",
+    "type": "module",
+    "imports": {
+        "#ffmpeg": "yujf-ffmpeg",
+        "#hono.ext": "yujf-hono.ext",
+        "#consts": "./consts.js"
+    },
+    "scripts": {
+        "dev": "vite",
+        "build": "tsc && vite build",
+        "preview": "vite preview",
+        "tauri": "tauri",
+        "tauri.dev": "tauri dev",
+        "tauri.build": "tauri build",
+        "server.build": "bun build ./server/app.js --compile --outfile app",
+        "server.dev": "bun run ./server/app.js --watch"
+    },
+    "dependencies": {
+        "@arco-design/web-react": "^2.66.5",
+        "@douyinfe/semi-ui": "^2.86.0",
+        "@radix-ui/react-slot": "^1.2.3",
+        "@tailwindcss/vite": "^4.1.13",
+        "@tauri-apps/api": "^2.8.0",
+        "@tauri-apps/plugin-dialog": "~2.4.0",
+        "@tauri-apps/plugin-fs": "~2.4.2",
+        "@tauri-apps/plugin-opener": "^2.5.0",
+        "button": "^1.1.1",
+        "class-variance-authority": "^0.7.1",
+        "clsx": "^2.1.1",
+        "dayjs": "^1.11.18",
+        "hono": "^4.9.6",
+        "lucide-react": "^0.542.0",
+        "react": "^18.3.1",
+        "react-dom": "^18.3.1",
+        "tailwind-merge": "^3.3.1",
+        "tailwindcss": "^4.1.13",
+        "yujf-ffmpeg": "^1.0.18",
+        "yujf-hono.ext": "^1.0.2"
+    },
+    "devDependencies": {
+        "@tauri-apps/cli": "^2.8.4",
+        "@types/node": "^24.3.1",
+        "@types/react": "^19.1.12",
+        "@types/react-dom": "^19.1.9",
+        "@vitejs/plugin-react": "^4.7.0",
+        "prettier": "^3.6.2",
+        "tw-animate-css": "^1.3.8",
+        "typescript": "~5.8.3",
+        "vite": "^7.1.4"
+    }
 }
