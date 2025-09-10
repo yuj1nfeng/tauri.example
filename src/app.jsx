@@ -5,6 +5,7 @@ import tauri from './utils/tauri.js';
 import service from './utils/service.js';
 import consts from '../consts.js';
 import socket from './utils/socket.js';
+import sse from './utils/sse.js';
 import ConcatVideos from './pages/concat.videos.jsx';
 import AddWatermark from './pages/add.watermark.jsx';
 import AutoCut from './pages/auto.cut.jsx';
@@ -16,7 +17,10 @@ import SplitVideos from './pages/split.videos.jsx';
 
 export default function () {
     const [list, setList] = React.useState([]);
-    React.useEffect(() => socket.check());
+    React.useEffect(() => {
+        socket.check();
+        sse.check();
+    });
     const uploadFiles = async () => {
         const result = await tauri.dialog.open({ filters: [{ name: 'videos', extensions: ['mp4', 'mov', 'jpeg'] }], multiple: true });
         for (const file of result) {

@@ -12,9 +12,9 @@
     "app": {
         "windows": [
             {
-                "title": "tauri-app",
-                "width": 800,
-                "height": 600
+                "title": "视频剪辑工具",
+                "width": 900,
+                "height": 800
             }
         ],
         "security": {

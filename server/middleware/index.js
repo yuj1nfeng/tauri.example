@@ -3,6 +3,6 @@ import cors from './cors';
 import error from './error';
 // import limit from './limit';
 import logger from './logger';
-// import notfound from './notfound';
+import sse from './sse';
 
-export default { cors, error, logger };
+export default { cors, error, logger, sse };

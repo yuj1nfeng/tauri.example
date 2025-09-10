@@ -9,6 +9,6 @@ if (!targetTriple) {
     console.error('Failed to determine platform target triple');
 }
 fs.renameSync(
-    `../app${ext}`,
+    `app${ext}`,
     `./src-tauri/binaries/app-${targetTriple}${ext}`
 );
