@@ -10,11 +10,11 @@
     },
     "scripts": {
         "dev": "vite",
-        "build": "tsc && vite build && bun run server.build",
+        "build": "bun run server.build && vite build",
         "preview": "vite preview",
         "rename": "bun run ./script/rename.js",
         "tauri": "tauri",
-        "tauri.dev": "tauri dev",
+        "start": "tauri dev",
         "tauri.build": "tauri build",
         "server.build": "bun build ./server/app.js --compile --outfile app && bun run rename",
         "server.dev": "bun run ./server/app.js --watch"
