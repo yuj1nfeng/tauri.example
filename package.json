@@ -23,6 +23,8 @@
         "@arco-design/web-react": "^2.66.5",
         "@douyinfe/semi-ui": "^2.86.0",
         "@radix-ui/react-slot": "^1.2.3",
+        "@sequelize/core": "^7.0.0-alpha.46",
+        "@sequelize/sqlite3": "^7.0.0-alpha.46",
         "@tailwindcss/vite": "^4.1.13",
         "@tauri-apps/api": "^2.8.0",
         "@tauri-apps/plugin-dialog": "~2.4.0",
@@ -39,7 +41,8 @@
         "tailwind-merge": "^3.3.1",
         "tailwindcss": "^4.1.13",
         "yujf-ffmpeg": "^1.0.18",
-        "yujf-hono.ext": "^1.0.2"
+        "yujf-hono.ext": "^1.0.2",
+        "yujf-sequelize.ext": "^1.0.1"
     },
     "devDependencies": {
         "@tauri-apps/cli": "^2.8.4",

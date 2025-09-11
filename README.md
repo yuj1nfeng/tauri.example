@@ -28,3 +28,5 @@ bun run server.dev
 ```shell
 bun run build
 ```
+
+- 注意,bunjs 项目中不能出现动态导入,要编译单文件,bunjs的编译暂时不支持动态导入

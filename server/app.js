@@ -15,9 +15,9 @@ app.post('video.meta', await import('./controller/video.meta.js').then((m) => m.
 app.post('video.play', await import('./controller/video.play.js').then((m) => m.default));
 app.post('video.thumbnail', await import('./controller/video.thumbnail.js').then((m) => m.default));
 
-app.get('/', (c) => {
+app.get('/', async (c) => {
     c.set('hello', 'world');
-    c.json({ status: 'ok' });
+    return c.json({ status: 'ok' });
 });
 
 export default app;
