@@ -5,7 +5,6 @@ import tauri from '../utils/tauri.js';
 import service from '../utils/service.js';
 import sse from '../utils/sse.js';
 import * as ui from '@arco-design/web-react';
-import * as icon from '@arco-design/web-react/icon';
 import consts from '#consts';
 
 
@@ -46,7 +45,7 @@ export default function ({ list }) {
         sse.addEventListener(task_id, progressHandle);
     };
     return (
-        <ui.Form {...consts.formProps} form={form} initialValues={values} onValuesChange={setValues}>
+        <ui.Form {...consts.config.formProps} form={form} initialValues={values} onValuesChange={setValues}>
             <ui.Grid.Col span={24}>
                 <ui.Progress percent={processing ? percent : 0} width='100%' style={{ display: processing ? 'block' : 'none' }} />
             </ui.Grid.Col>

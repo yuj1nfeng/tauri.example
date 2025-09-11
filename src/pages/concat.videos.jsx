@@ -5,10 +5,8 @@ import tauri from '../utils/tauri.js';
 import service from '../utils/service.js';
 import sse from '../utils/sse.js';
 import * as ui from '@arco-design/web-react';
-import * as icon from '@arco-design/web-react/icon';
 import dayjs from 'dayjs';
-import consts from '#consts';
-const { options } = consts;
+import consts ,{options}from '#consts';
 
 
 export default function ConcatVideos({ list }) {
@@ -57,7 +55,7 @@ export default function ConcatVideos({ list }) {
         sse.addEventListener(task_id, progressHandle);
     };
     return (
-        <ui.Form {...consts.formProps} form={form} initialValues={values} onValuesChange={setValues}>
+        <ui.Form {...consts.config.formProps} form={form} initialValues={values} onValuesChange={setValues}>
             <ui.Grid.Col span={24}>
                 <ui.Progress percent={percent} width='100%' style={{ display: processing ? 'inline-block' : 'none' }} />
             </ui.Grid.Col>
@@ -73,7 +71,7 @@ export default function ConcatVideos({ list }) {
                 <ui.Form.Item rules={[{ required: true, message: '请设置音频通道数' }]} field='audio_channels' label='音频通道数' children={<ui.InputNumber />} />
                 <ui.Form.Item rules={[{ required: true, message: '请设置音频编码器' }]} field='audio_codec' label='音频编码器' children={<ui.Select options={options.audio_codec} autoWidth={{ minWidth: '180px' }} />} />
             </ui.Grid.Col>
-            <ui.Grid.Col span={8}>
+            <ui.Grid.Col span={8}>``
                 <ui.Form.Item rules={[{ required: true, message: '请设置输出格式' }]} field='output_fmt' label='输出格式' children={<ui.Select options={options.video_output_fmt} autoWidth={{ minWidth: '180px' }} />} />
                 <ui.Form.Item rules={[{ required: true, message: '请设置输出文件' }]} field='output_file' label='输出文件 ' children={<ui.Input onClick={setOutputFile} />} />
             </ui.Grid.Col>

@@ -3,7 +3,7 @@ import * as ui from '@arco-design/web-react';
 import * as icon from '@arco-design/web-react/icon';
 import tauri from './utils/tauri.js';
 import service from './utils/service.js';
-import consts from '../consts.js';
+import consts from '#consts';
 import sse from './utils/sse.js';
 import ConcatVideos from './pages/concat.videos.jsx';
 import AddWatermark from './pages/add.watermark.jsx';
@@ -22,7 +22,7 @@ export default function () {
         for (const file of result) {
             const result = await service.getVideoMeta(file);
             if (result.error) continue;
-            const meta = consts.fmtMeta(result);
+            const meta = consts.fn.fn.fmtMeta(result);
             meta.thumbnail = await service.getThumbnail(file);
             setList((prev) => [...prev, meta]);
         }
@@ -36,7 +36,7 @@ export default function () {
             const result = await service.getVideoMeta(file);
             console.log('result', result);
             if (result.error) continue;
-            const meta = consts.fmtMeta(result);
+            const meta = consts.fn.fmtMeta(result);
             meta.thumbnail = await service.getThumbnail(file);
 
             setList((prev) => [...prev, meta]);

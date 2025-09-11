@@ -4,9 +4,7 @@ import React from 'react';
 import tauri from '../utils/tauri.js';
 import service from '../utils/service.js';
 import * as ui from '@arco-design/web-react';
-import * as icon from '@arco-design/web-react/icon';
-import consts from '../../consts.js';
-const { options } = consts;
+import consts from '#consts';
 
 
 export default function ConcatVideos({ list }) {
@@ -57,7 +55,7 @@ export default function ConcatVideos({ list }) {
 
     };
     return (
-        <ui.Form {...consts.formProps}>
+        <ui.Form {...consts.config.formProps}>
             <ui.Grid.Col span={24}>
                 <ui.Progress percent={percent} width='100%' style={{ display: processing ? 'inline-block' : 'none' }} />
             </ui.Grid.Col>

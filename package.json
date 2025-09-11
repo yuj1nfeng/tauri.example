@@ -6,18 +6,16 @@
     "imports": {
         "#ffmpeg": "yujf-ffmpeg",
         "#hono.ext": "yujf-hono.ext",
-        "#consts": "./consts.js"
+        "#consts": "./consts/index.js"
     },
     "scripts": {
         "dev": "vite",
-        "build": "bun run server.build && vite build",
+        "build": "bun run script/build.js && vite build",
+        "pack": "tauri build",
+        "start":"tauri dev",
+        "server":"bun run server/app.js --watch",
         "preview": "vite preview",
-        "rename": "bun run ./script/rename.js",
-        "tauri": "tauri",
-        "start": "tauri dev",
-        "tauri.build": "tauri build",
-        "server.build": "bun build ./server/app.js --compile --outfile app && bun run rename",
-        "server.dev": "bun run ./server/app.js --watch"
+        "tauri": "tauri"
     },
     "dependencies": {
         "@arco-design/web-react": "^2.66.5",
@@ -36,6 +34,7 @@
         "dayjs": "^1.11.18",
         "hono": "^4.9.6",
         "lucide-react": "^0.542.0",
+        "openai": "^5.20.1",
         "react": "^18.3.1",
         "react-dom": "^18.3.1",
         "tailwind-merge": "^3.3.1",
@@ -50,6 +49,7 @@
         "@types/react": "^19.1.12",
         "@types/react-dom": "^19.1.9",
         "@vitejs/plugin-react": "^4.7.0",
+        "bun": "^1.2.21",
         "prettier": "^3.6.2",
         "tw-animate-css": "^1.3.8",
         "typescript": "~5.8.3",
