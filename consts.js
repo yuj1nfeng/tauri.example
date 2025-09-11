@@ -1,4 +1,4 @@
-
+import { message } from '@tauri-apps/plugin-dialog';
 
 const formProps = {
     layout: 'inline', //
@@ -9,6 +9,11 @@ const formProps = {
 };
 
 const events = {
+    message: 'message',
+    info: 'info',
+    warning: 'warning',
+    error: 'error',
+    progress: 'progress',
     concat_vidoe_progeress: 'concat-progress',
     split_video_progeress: 'split-progress',
     add_watermark_progeress: 'add-watermark-progress',
@@ -18,9 +23,7 @@ const events = {
     reove_watermark_progeress: 'remove-watermark-progress',
 };
 
-
 const options = {
-
     video_output_fmt: [
         { label: 'mp4', value: 'mp4' },
         { label: 'mkv', value: 'mkv' },
@@ -47,9 +50,8 @@ const options = {
     audio_codec: [
         { label: 'aac', value: 'aac' },
         { label: 'mp3', value: 'mp3' },
-    ]
+    ],
 };
-
 
 const fmtDuration = (duration) => {
     const minutes = Math.floor(duration / 60);
@@ -89,6 +91,5 @@ function fmtMeta(meta) {
     };
     return info;
 }
-
 
 export default { events, options, formProps, fmtDuration, fmtFileSize, fmtMeta };

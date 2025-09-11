@@ -3,15 +3,16 @@
 import React from 'react';
 import tauri from '../utils/tauri.js';
 import service from '../utils/service.js';
-import socket from '../utils/socket.js';
+import sse from '../utils/sse.js';
 import * as ui from '@arco-design/web-react';
 import * as icon from '@arco-design/web-react/icon';
 import dayjs from 'dayjs';
-import consts from '../../consts.js';
+import consts from '#consts';
 const { options } = consts;
 
 
 export default function ConcatVideos({ list }) {
+    const [currnet_task_id, setCurrentTaskId] = React.useState(null);
     const [processing, setProcessing] = React.useState(false);
     const [percent, setPercent] = React.useState([]);
     const [values, setValues] = React.useState({
@@ -26,18 +27,13 @@ export default function ConcatVideos({ list }) {
     });
     const [form] = ui.Form.useForm();
 
-    const progressHandle = (event) => {
-        setPercent(event.detail);
+    const progressHandle = (data) => {
+        setPercent(data);
+        if (parseInt(data) === 100) {
+            setProcessing(false);
+            sse.removeEventListener(currnet_task_id);
+        }
     };
-
-    React.useEffect(() => {
-        socket.check();
-        window.addEventListener(consts.events.concat_vidoe_progeress, progressHandle);
-        return () => window.removeEventListener(consts.events.concat_vidoe_progeress, progressHandle);
-    }, []);
-
-
-
 
     const setOutputFile = async (e) => {
         const values = form.getFieldsValue();
@@ -49,18 +45,16 @@ export default function ConcatVideos({ list }) {
     };
 
     const startHandle = async () => {
-        socket.check();
+        sse.check();
         const values = await form.validate();
         setProcessing(true);
         setPercent(0);
-        window.addEventListener(consts.events.concat_vidoe_progeress, progressHandle);
-        values['videos'] = list;
-        const result = await service.concatVideos(values);
-        form.setFieldValue('output_file', null);
-        window.removeEventListener(consts.events.concat_vidoe_progeress, progressHandle);
-        setProcessing(false);
-        setPercent(100);
 
+        values['videos'] = list;
+        const { task_id } = await service.concatVideos(values);
+        setCurrentTaskId(task_id);
+        form.setFieldValue('output_file', null);
+        sse.addEventListener(task_id, progressHandle);
     };
     return (
         <ui.Form {...consts.formProps} form={form} initialValues={values} onValuesChange={setValues}>
