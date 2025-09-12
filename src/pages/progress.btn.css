@@ -1,0 +1,136 @@
+:root {
+    --btn-primary: #102336; /* 深蓝色 */
+    --btn-primary-hover: #0c2f55; /* 更深的蓝色 */
+    --btn-text: #ffffff;
+    --btn-disabled: rgba(44, 62, 80, 0.6); /* 基于新主色的禁用颜色 */
+    --btn-progress-opacity: 0.6; /* 增加进度条透明度以提高对比度 */
+    --btn-border-radius: 8px; /* 增加圆角 */
+    --btn-box-shadow: 0 4px 12px rgba(127, 15, 150, 0.2); /* 增加阴影，更深 */
+}
+
+.progress-btn {
+    position: relative;
+    overflow: hidden;
+    border: none;
+    border-radius: var(--btn-border-radius);
+    background: linear-gradient(135deg, var(--btn-primary) 0%, #34495e 100%); /* 渐变背景 */
+    color: var(--btn-text);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: var(--btn-box-shadow);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 尺寸样式 */
+.progress-btn--small {
+    padding: 6px 12px;
+    font-size: 12px;
+}
+
+.progress-btn--medium {
+    padding: 10px 20px;
+    font-size: 16px;
+}
+
+.progress-btn--large {
+    padding: 14px 28px;
+    font-size: 18px;
+}
+
+/* 悬停状态 - 深色增强 */
+.progress-btn:hover:not(:disabled) {
+    background: linear-gradient(135deg, var(--btn-primary-hover) 0%, #2c3e50 100%); /* 悬停渐变 */
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3); /* 悬停阴影 */
+    transform: translateY(-1px); /* 轻微上浮效果 */
+}
+
+/* 禁用状态 - 提高透明度 */
+.progress-btn:disabled {
+    background: var(--btn-disabled);
+    cursor: not-allowed;
+    box-shadow: none;
+    opacity: 0.8; /* 禁用时整体透明度 */
+}
+
+/* Loading 状态 */
+button.progress-btn.loading {
+    cursor: wait;
+    background: linear-gradient(135deg, var(--btn-primary) 0%, #34495e 100%); /* 加载时保持渐变 */
+}
+
+button.progress-btn.loading .progress-btn__content {
+    opacity: 0.7; /* 加载时内容稍微淡出 */
+    transition: opacity 0.3s ease;
+}
+
+button.progress-btn.loading .progress-btn__loader {
+    opacity: 1; /* 加载时显示加载器 */
+}
+
+/* Completed 状态 */
+.progress-btn--completed {
+    background: linear-gradient(135deg, var(--btn-primary) 0%, #34495e 100%);
+    box-shadow: var(--btn-box-shadow);
+}
+.progress-btn--completed:hover:not(:disabled) {
+    background: linear-gradient(135deg, var(--btn-primary-hover) 0%, #2c3e50 100%);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+    transform: translateY(-1px);
+}
+
+.progress-btn__bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    z-index: 1;
+    background-color: rgba(255, 255, 255, var(--btn-progress-opacity)); /* 进度条颜色 */
+    border-radius: var(--btn-border-radius); /* 继承按钮圆角 */
+    transition: width 0.3s ease-out; /* 平滑过渡 */
+    transform-origin: left; /* 从左侧开始填充 */
+}
+
+.progress-btn__content {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    z-index: 2; /* 确保内容在进度条之上 */
+}
+
+.progress-btn__loader {
+    width: 14px; /* 调整加载器大小 */
+    height: 14px;
+    border: 2px solid rgba(255, 255, 255, 0.5); /* 加载器边框颜色 */
+    border-top-color: var(--btn-text); /* 加载器顶部颜色 */
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    opacity: 0; /* 默认隐藏加载器 */
+    transition: opacity 0.3s ease;
+}
+
+/* 针对不同尺寸调整加载器大小 */
+.progress-btn--small .progress-btn__loader {
+    width: 12px;
+    height: 12px;
+}
+
+.progress-btn--medium .progress-btn__loader {
+    width: 16px;
+    height: 16px;
+}
+
+.progress-btn--large .progress-btn__loader {
+    width: 20px;
+    height: 20px;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}

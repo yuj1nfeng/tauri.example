@@ -1,11 +1,10 @@
-
-
 import React from 'react';
 import tauri from '../utils/tauri.js';
 import service from '../utils/service.js';
 import sse from '../utils/sse.js';
 import * as ui from '@arco-design/web-react';
 import consts from '#consts';
+import ProgressBtn from './progress.btn.jsx';
 
 
 export default function ({ list }) {
@@ -46,20 +45,20 @@ export default function ({ list }) {
     };
     return (
         <ui.Form {...consts.config.formProps} form={form} initialValues={values} onValuesChange={setValues}>
-            <ui.Grid.Col span={24}>
-                <ui.Progress percent={processing ? percent : 0} width='100%' style={{ display: processing ? 'block' : 'none' }} />
-            </ui.Grid.Col>
-
 
             <ui.Form.Item rules={[{ required: true, message: '请设置输出格式' }]} field='audio_output_fmt' label='输出格式' children={<ui.Select options={consts.options.audio_output_fmt} autoWidth={{ minWidth: '180px' }} />} />
 
             <ui.Form.Item rules={[{ required: true, message: '请设置输出目录' }]} field='output_dir' label='输出目录' onClick={setOutputDir} children={<ui.Input autoWidth={{ minWidth: '360px' }} />} />
 
-            <ui.Grid.Col span={24}>
-                <ui.Button onClick={startHandle} type='primary' loading={processing} disabled={list.length === 0} style={{ width: '100%' }}>
-                    开始处理
-                </ui.Button>
-            </ui.Grid.Col>
+            <ProgressBtn
+                onClick={startHandle}
+                size='small'
+                loading={processing}
+                progress={percent}
+                disabled={list.length === 0}
+                children={processing ? '处理中' : '开始处理'}
+                type='primary'
+                style={{ width: '100%' }} />
         </ui.Form>
     );
 }

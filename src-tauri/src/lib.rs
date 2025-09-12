@@ -4,14 +4,10 @@ fn greet(name: &str) -> String {
     format!("Hello, {}! You've been greeted from Rust!", name)
 }
 
-
-
 #[tauri::command]
-fn convert_video(input:&str)->String{
+fn convert_video(input: &str) -> String {
     format!("file save at {}", input)
 }
-
-
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -19,7 +15,7 @@ pub fn run() {
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_opener::init())
-        .invoke_handler(tauri::generate_handler![greet,convert_video])
+        .invoke_handler(tauri::generate_handler![greet, convert_video])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

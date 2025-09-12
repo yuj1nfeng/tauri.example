@@ -4,9 +4,10 @@ import path from 'node:path';
 import { emitEvent } from '../middleware/sse.js';
 import dayjs from 'dayjs';
 import consts from '#consts';
+
 export default async (ctx) => {
     const body = await ctx.req.json();
-    const { videos, output_dir, audio_output_fmt, audio_codec, audio_bit_rate } = body;
+    const { videos, output_dir, output_fmt, position, scale, opacity = 1 } = body;
     if (!(await fs.exists(output_dir))) await fs.mkdir(output_dir, { recursive: true, force: true });
     const task_id = dayjs().format('YYYYMMDDHHmmss') + Math.floor(Math.random() * 1000);
     ctx.set('task_id', task_id);
@@ -18,18 +19,18 @@ export default async (ctx) => {
         try {
             for (const video of videos) {
                 const shotname = path.basename(video.filename);
+                const ext = path.extname(video.filename);
                 const duration = parseInt(video.duration);
-                if (!video.audio) {
-                    handled += duration;
-                    await emitEvent(task_id, (((handled) / total_duration) * 100).toFixed(2));
-                    await emitEvent(consts.events.warning, `${shotname} 无音频, 跳过`);
+                if (!video.video) {
+                    await emitEvent(consts.events.warning, `${shotname} 无视频, 跳过`);
                     continue;
                 }
-                const output = path.join(output_dir, `${path.basename(video.filename, path.extname(video.filename))}.${audio_output_fmt}`);
-                await ffmpeg.extraAudio(video.filename, output, { progress_cb: progress_cb });
-                handled += Number(video.duration);
+                const watermark = 'd:/test/1.png';
+                const output_name = `${path.basename(video.filename, ext)}.watermark.${output_fmt}`;
+                const output_file = path.join(output_dir, output_name);
+                await ffmpeg.addWatermark(video.filename, watermark, output_file, { position, scale, opacity, progress_cb: progress_cb });
+                handled += duration;
             }
-
             await emitEvent(consts.events.info, '处理完成');
         } catch (error) {
             await emitEvent(consts.events.error, error.message);

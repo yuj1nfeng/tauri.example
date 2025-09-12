@@ -5,6 +5,7 @@ import sse from '../utils/sse.js';
 import * as ui from '@arco-design/web-react';
 import dayjs from 'dayjs';
 import consts, { options } from '#consts';
+import ProgressBtn from './progress.btn.jsx';
 
 export default function ConcatVideos({ list }) {
     const [currnet_task_id, setCurrentTaskId] = React.useState(null);
@@ -52,10 +53,7 @@ export default function ConcatVideos({ list }) {
         sse.addEventListener(task_id, progressHandle);
     };
     return (
-        <ui.Form {...consts.config.formProps} form={form} initialValues={values} onValuesChange={setValues}>
-            <ui.Grid.Col span={24}>
-                <ui.Progress percent={percent} width='100%' style={{ display: processing ? 'inline-block' : 'none' }} />
-            </ui.Grid.Col>
+        <ui.Form  {...consts.config.formProps} form={form} initialValues={values} onValuesChange={setValues}>
             <ui.Grid.Col span={12}>
                 <ui.Form.Item rules={[{ required: true, message: '请设置视频码率' }]} field='video_bit_rate' label='视频码率' children={<ui.Input />} />
                 <ui.Form.Item rules={[{ required: true, message: '请设置视频帧率' }]} field='video_frame_rate' label='视频帧率' children={<ui.Input />} />
@@ -78,21 +76,24 @@ export default function ConcatVideos({ list }) {
                     children={<ui.Select options={options.audio_codec} autoWidth={{ minWidth: '180px' }} />}
                 />
             </ui.Grid.Col>
-            <ui.Grid.Col span={8}>
-                ``
+            <ui.Grid.Col span={24}>
                 <ui.Form.Item
                     rules={[{ required: true, message: '请设置输出格式' }]}
                     field='output_fmt'
                     label='输出格式'
                     children={<ui.Select options={options.video_output_fmt} autoWidth={{ minWidth: '180px' }} />}
                 />
-                <ui.Form.Item rules={[{ required: true, message: '请设置输出文件' }]} field='output_file' label='输出文件 ' children={<ui.Input onClick={setOutputFile} />} />
+                <ui.Form.Item rules={[{ required: true, message: '请设置输出文件' }]} field='output_file' label='输出文件' children={<ui.Input onClick={setOutputFile} />} />
             </ui.Grid.Col>
-            <ui.Grid.Col span={24}>
-                <ui.Button onClick={startHandle} loading={processing} disabled={processing || list.length === 0} type='primary' style={{ width: '100%' }}>
-                    开始处理
-                </ui.Button>
-            </ui.Grid.Col>
+            <ProgressBtn
+                onClick={startHandle}
+                size='small'
+                loading={processing}
+                progress={percent}
+                disabled={list.length === 0}
+                children={processing ? '处理中' : '开始处理'}
+                type='primary'
+                style={{ width: '100%' }} />
         </ui.Form>
     );
 }

@@ -38,8 +38,33 @@ const concatVideos = async (input) => {
     return result;
 };
 
+const splitVideos = async (input) => {
+    const req_url = `${base_url}/video.split`;
+    const headers = { 'content-type': 'application/json' };
+    const response = await fetch(req_url, {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify(input)
+    });
+    const result = await response.json();
+    return result;
+};
+
+
 const extraAudio = async (input) => {
     const req_url = `${base_url}/audio.extra`;
+    const headers = { 'content-type': 'application/json' };
+    const response = await fetch(req_url, {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify(input)
+    });
+    const result = await response.json();
+    return result;
+};
+
+const addWatermark = async (input) => {
+    const req_url = `${base_url}/video.add.watermark`;
     const headers = { 'content-type': 'application/json' };
     const response = await fetch(req_url, {
         method: 'POST',
@@ -83,6 +108,8 @@ export default {
     concatVideos,
     extraAudio,
     getThumbnail,
-    playVideo
+    playVideo,
+    splitVideos,
+    addWatermark
 
 };

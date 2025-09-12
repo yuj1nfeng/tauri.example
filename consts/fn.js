@@ -29,8 +29,10 @@ function fmtMeta(meta) {
         ...meta,
         description: descriptions.join('\t'),
         title: title.join('\t'),
-        fmt_duration: fmtDuration(meta.duration),
-        fmt_size: fmtFileSize(meta.size),
+        fmt_duration: fmtDuration(meta.duration || 0),
+        fmt_size: fmtFileSize(meta.size || 0),
+        duration: meta.duration || 0,
+        size: meta.size || 0
     };
     return info;
 }

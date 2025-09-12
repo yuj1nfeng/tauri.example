@@ -26,4 +26,11 @@ export default {
         { label: 'aac', value: 'aac' },
         { label: 'mp3', value: 'mp3' },
     ],
+
+    watermark_position: [
+        { label: '左上', value: 'left-top' },
+        { label: '右上', value: 'right-top' },
+        { label: '左下', value: 'left-bottom' },
+        { label: '右下', value: 'right-bottom' },
+    ],
 };

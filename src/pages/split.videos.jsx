@@ -1,27 +1,25 @@
 import React from 'react';
 import tauri from '../utils/tauri.js';
-import service from '../utils/service.js';
+import utils from '../utils/index.js';
 import * as ui from '@arco-design/web-react';
 import consts from '#consts';
+import ProgressBtn from './progress.btn.jsx';
 
 export default function ConcatVideos({ list }) {
+    const [currnet_task_id, setCurrentTaskId] = React.useState(null);
     const [processing, setProcessing] = React.useState(false);
     const [percent, setPercent] = React.useState([]);
-    const [values, setValues] = React.useState({
-        video_codec: 'h264',
-        output_fmt: 'mp4',
-        output_dir: '~/Videos',
-        video_frame_rate: 15,
-        video_bit_rate: 1000,
-        video_size: '1920x1080',
-        audio_codec: 'aac',
-        audio_sample_rate: 44100,
-        audio_channels: 2,
-    });
+    const [values, setValues] = React.useState({ split_duration: 60 });
     const [form] = ui.Form.useForm();
 
-    const progressHandle = (event) => {
-        setPercent(event.detail);
+    const progressHandle = (data) => {
+        console.log(data);
+        setPercent(data);
+        if (parseInt(data) === 100) {
+            setProcessing(false);
+            utils.sse.removeEventListener(currnet_task_id, progressHandle);
+
+        }
     };
 
     React.useEffect(() => {
@@ -29,52 +27,57 @@ export default function ConcatVideos({ list }) {
         // return () => window.removeEventListener('concat-progress', progressHandle);
     }, []);
 
-    const setOutputFile = async (e) => {
-        const result = await tauri.dialog.save({ title: '请选择保存路径', defaultPath: `concat.${values.output_fmt}` });
+    const setOutputDir = async (e) => {
+        const result = await tauri.dialog.open({ directory: true });
         if (!result) return;
-        form.setFieldValue('output_file', result.replaceAll('\\', '/'));
+        form.setFieldValue('output_dir', result.replace(/\\/g, '/'));
     };
 
     const startHandle = async () => {
+        utils.sse.check();
+        const values = await form.validate();
         setProcessing(true);
         setPercent(0);
-        const values = form.getFieldsValue();
-        console.log('values', values);
-        console.log('videos', list);
         values['videos'] = list;
-        const result = await service.concatVideos(values);
-        console.log('result', result);
-        setProcessing(false);
-        setPercent(100);
+        const { task_id } = await utils.service.splitVideos(values);
+        setCurrentTaskId(task_id);
+        utils.sse.addEventListener(task_id, progressHandle);
     };
     return (
         <ui.Form {...consts.config.formProps} form={form} initialValues={values} onValuesChange={setValues}>
-            <ui.Grid.Col span={24}>
-                <ui.Progress percent={percent} width='100%' style={{ display: processing ? 'inline-block' : 'none' }} />
-            </ui.Grid.Col>
+            <ui.Form.Item
+                field='split_duration'
+                rules={[{ required: true, message: '请设置输出目录' }]}
+                label='切片时长'
+                children={<ui.Slider
+                    placeholder='请选择切片时长'
+                    step={5}
+                    min={5}
+                    max={150}
+                    defaultValue={60}
+                    formatTooltip={(number) => `${number} 秒`}
+                    style={{ width: '240px' }}
+                />} />
 
-            <ui.Grid.Col span={24}>
-                <ui.Form.Item label='切片时长'>
-                    <ui.Slider
-                        placeholder='请选择切片时长'
-                        step={5}
-                        min={5}
-                        max={150}
-                        defaultValue={60}
-                        formatTooltip={(number) => `${number} 秒`}
-                        showInput={{ suffix: 's' }}
-                        style={{ width: '50%' }}
-                    />
-                </ui.Form.Item>
-                <ui.Form.Item label='输出目录'>
-                    <ui.Input placeholder='请选择输出目录' defaultValue='~/Videos' style={{ width: '50%' }} />
-                </ui.Form.Item>
-            </ui.Grid.Col>
-            <ui.Grid.Col span={24}>
-                <ui.Button type='primary' style={{ width: '100%' }}>
-                    开始处理
-                </ui.Button>
-            </ui.Grid.Col>
+            <ui.Form.Item
+                field='output_dir'
+                rules={[{ required: true, message: '请设置输出目录' }]}
+                label='输出目录'
+                children={<ui.Input
+                    onClick={setOutputDir}
+                    placeholder='请选择输出目录'
+                    defaultValue='~/Videos'
+                    style={{ width: '380px' }} />} />
+
+            <ProgressBtn
+                onClick={startHandle}
+                size='small'
+                loading={processing}
+                progress={percent}
+                disabled={list.length === 0}
+                children={processing ? '处理中' : '开始处理'}
+                type='primary'
+                style={{ width: '100%' }} />
         </ui.Form>
     );
 }

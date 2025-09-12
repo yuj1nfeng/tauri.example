@@ -29,10 +29,6 @@ export default function ConcatVideos({ list }) {
         window.addEventListener('concat-progress', progressHandle);
         // return () => window.removeEventListener('concat-progress', progressHandle);
     }, []);
-
-
-
-
     const setOutputFile = async (e) => {
         const result = await tauri.dialog.save({ title: '请选择保存路径', defaultPath: `concat.${values.output_fmt}` });
         if (!result) return;
