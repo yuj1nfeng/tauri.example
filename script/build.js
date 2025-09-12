@@ -8,4 +8,4 @@ if (!target_triple) console.error('Failed to determine platform target triple');
 const target_dir = './src-tauri/binaries';
 // await fs.mkdir(target_dir, { recursive: true, force: true });
 // await fs.rename(`app${ext}`, `${target_dir}/app-${target_triple}${ext}`);
-await Bun.$`bun build ./server/app.js --compile --outfile ${target_dir}/app-${target_triple}${ext}`;
+await Bun.$`bun build ./server/app.js --compile --outfile ${target_dir}/app-${target_triple}${ext}`.quiet();

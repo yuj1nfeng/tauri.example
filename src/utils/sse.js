@@ -15,10 +15,11 @@ function getEventSource() {
     }
     console.log('create new event source');
     source = new EventSource(url);
-    // source.addEventListener('time-update', (event) => {
-    //     const { data } = event;
-    //     ui.Message.success(data);
-    // });
+    source.addEventListener('time-update', (event) => {
+        const { data } = event;
+        console.log('time-update', data);
+        ui.Message.info(data);
+    });
 
     source.addEventListener('connected', (event) => {
         const { data } = event;

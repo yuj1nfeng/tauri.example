@@ -14,7 +14,7 @@ import RemoveSubtitle from './pages/remove.subtitle.jsx';
 import RemoveWatermark from './pages/remove.watermark.jsx';
 import SplitVideos from './pages/split.videos.jsx';
 
-import '@arco-design/web-react/dist/css/arco.css';
+
 
 export default function () {
     const [list, setList] = React.useState([]);

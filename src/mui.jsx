@@ -79,7 +79,7 @@ export default function () {
                         {list.map((item, index) => {
                             return (
                                 <ui.ListItem index={index} key={index}>
-                                    <ui.ListItemAvatar onClick={service.playVideo(item.filename)} children={<ui.Avatar src={item.thumbnail} />} />
+                                    <ui.ListItemAvatar onClick={() => service.playVideo(item.filename)} children={<ui.Avatar src={item.thumbnail} />} />
                                     <ui.ListItemText primary={item.title} secondary={item.description} />
                                     <ui.ListItemIcon children={<icon.Delete onClick={() => removeFile(index)} />} />
                                 </ui.ListItem>
