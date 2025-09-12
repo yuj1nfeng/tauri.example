@@ -14,15 +14,17 @@ import RemoveSubtitle from './pages/remove.subtitle.jsx';
 import RemoveWatermark from './pages/remove.watermark.jsx';
 import SplitVideos from './pages/split.videos.jsx';
 
+import '@arco-design/web-react/dist/css/arco.css';
+
 export default function () {
     const [list, setList] = React.useState([]);
     React.useEffect(() => sse.check());
     const uploadFiles = async () => {
-        const result = await tauri.dialog.open({ filters: [{ name: 'videos', extensions: ['mp4', 'mov', 'jpeg'] }], multiple: true });
+        const result = await tauri.dialog.open({ filters: [{ name: 'videos', extensions: ['mp4', 'mov'] }], multiple: true });
         for (const file of result) {
             const result = await service.getVideoMeta(file);
             if (result.error) continue;
-            const meta = consts.fn.fn.fmtMeta(result);
+            const meta = consts.fn.fmtMeta(result);
             meta.thumbnail = await service.getThumbnail(file);
             setList((prev) => [...prev, meta]);
         }
@@ -56,14 +58,17 @@ export default function () {
         <ui.List.Item
             style={{ margin: 0, padding: 0, fontSize: '10px', fontWeight: 'bold' }}
             key={index}
-            actions={[
-                <span>{item.fmt_duration}</span>,
-                <ui.Button onClick={() => removeFile(index)} shape='circle' size='mini' icon={<icon.IconDelete />} />,
-            ]}
+            actions={[<span>{item.fmt_duration}</span>, <ui.Button onClick={() => removeFile(index)} shape='circle' size='mini' icon={<icon.IconDelete />} />]}
         >
-            <ui.List.Item.Meta avatar={<ui.Avatar triggerIcon={<icon.IconPlayArrow onClick={() => service.playVideo(item.filename)} />} shape='square'>
-                <ui.Image src={item.thumbnail} />
-            </ui.Avatar>} title={item.title} description={item.description} />
+            <ui.List.Item.Meta
+                avatar={
+                    <ui.Avatar triggerIcon={<icon.IconPlayArrow onClick={() => service.playVideo(item.filename)} />} shape='square'>
+                        <ui.Image src={item.thumbnail} />
+                    </ui.Avatar>
+                }
+                title={item.title}
+                description={item.description}
+            />
         </ui.List.Item>
     );
     return (

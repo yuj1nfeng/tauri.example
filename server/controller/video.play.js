@@ -3,7 +3,10 @@ export default async (ctx) => {
     const body = await ctx.req.json();
     const { input } = body;
     const meta = await ffmpeg.getMetadata(input);
-    // '-noborder'
-    Bun.spawn(['ffplay', input, '-y', meta.video.height / 2], { stdout: 'ignore', stderr: 'ignore' });
+    const stdio = ['ignore', 'ignore', 'ignore'];
+    // ffplay '-noborder'
+    // Bun.spawn(['ffplay', input, '-y', '-noborder', meta.video.height / 2], { stdio: stdio });
+    // vlc
+    Bun.spawn(['vlc', '--zoom', '0.5', input], { stdio: stdio });
     return ctx.json({});
 };
