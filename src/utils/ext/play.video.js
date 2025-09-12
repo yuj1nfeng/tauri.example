@@ -2,9 +2,8 @@
  * 显示一个带有关闭按钮的视频播放器。
  * @param {string} url - 视频的URL。
  */
-export default function (url) {
+export default async function async(url) {
     let isVisible = true;
-
     // 创建主容器 div
     const div = document.createElement('div');
     div.style.position = 'fixed';

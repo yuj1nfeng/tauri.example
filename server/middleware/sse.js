@@ -1,12 +1,15 @@
-// import eventService from '../service/event.service';
-
 import { streamSSE } from 'hono/streaming';
 
 const clients = [];
 
 export const emitEvent = async (event, data, client_id = 'all') => {
     if (client_id === 'all') {
-        await Promise.all(clients.every(async (stream) => !stream.closed && (await stream.writeSSE({ data, event }))));
+        if (clients.length === 0) return;
+
+        for (const stream of clients) {
+            if (stream.closed) continue;
+            await stream.writeSSE({ data, event });
+        }
         return;
     }
     await clients.find((stream) => stream.client_id === client_id).writeSSE({ data, event });

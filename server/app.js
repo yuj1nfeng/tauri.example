@@ -20,8 +20,10 @@ app.get('/', async (c) => {
     return c.json({ status: 'ok' });
 });
 
-export default Bun.serve({
-    fetch: app.fetch,
-    port: 3000,
-    development: true,
-});
+export default app;
+
+// export default Bun.serve({
+//     fetch: app.fetch,
+//     port: 3000,
+//     development: true,
+// });

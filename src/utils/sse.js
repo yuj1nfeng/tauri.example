@@ -15,35 +15,9 @@ function getEventSource() {
     }
     console.log('create new event source');
     source = new EventSource(url);
-    source.addEventListener('time-update', (event) => {
-        const { data } = event;
-        console.log('time-update', data);
-        ui.Message.info(data);
-    });
-
-    source.addEventListener('connected', (event) => {
-        const { data } = event;
-        console.log('connected');
-        ui.Message.success(data);
-    });
-
-    source.addEventListener(consts.events.success, (event) => {
-        const { data } = event;
-        console.log('success');
-        ui.Message.success(data);
-    });
-
-    source.addEventListener(consts.events.error, (event) => {
-        const { data } = event;
-        console.log('error');
-        ui.Message.error(data);
-    });
-
-    source.addEventListener(consts.events.info, (event) => {
-        const { data } = event;
-        console.log('info', data);
-        ui.Message.info(data);
-    });
+    source.addEventListener(consts.events.error, (event) => ui.Message.error(event.data));
+    source.addEventListener(consts.events.warning, (event) => ui.Message.warning(event.data));
+    source.addEventListener(consts.events.info, (event) => ui.Message.info(event.data));
     return source;
 }
 

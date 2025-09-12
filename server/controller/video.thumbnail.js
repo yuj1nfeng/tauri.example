@@ -1,7 +1,10 @@
 import ffmpeg from '#ffmpeg';
+import fs from 'node:fs/promises';
 export default async (ctx) => {
     const body = await ctx.req.json();
     const { input } = body;
+    const stat = await fs.stat(input);
+    if (!stat.isFile()) return ctx.text('');
     const result = await ffmpeg.generateThumbnail(input);
     return ctx.text(result);
 };
