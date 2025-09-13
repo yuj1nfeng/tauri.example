@@ -5,14 +5,15 @@ import tauri from './utils/tauri.js';
 import service from './utils/service.js';
 import consts from '#consts';
 import sse from './utils/sse.js';
+import yaml from 'yaml';
 import utils from './utils/index.js';
-import ConcatVideos from './pages/concat.videos.jsx';
-import AddWatermark from './pages/add.watermark.jsx';
-import AutoCut from './pages/auto.cut.jsx';
-import ExtraAudio from './pages/extra.audio.jsx';
-import RemoveAudio from './pages/remove.audio.jsx';
-import SplitVideos from './pages/split.videos.jsx';
-import MediaDownload from './pages/media.download.jsx';
+import ConcatVideos from './component/concat.videos.jsx';
+import AddWatermark from './component/add.watermark.jsx';
+import AutoCut from './component/auto.cut.jsx';
+import ExtraAudio from './component/extra.audio.jsx';
+import RemoveAudio from './component/remove.audio.jsx';
+import SplitVideos from './component/split.videos.jsx';
+import MediaDownload from './component/media.download.jsx';
 
 export default function () {
     const [list, setList] = React.useState([]);
@@ -27,6 +28,8 @@ export default function () {
             const meta = consts.fn.fmtMeta(result);
             meta.thumbnail = await service.getThumbnail(file);
             setList((prev) => [...prev, meta]);
+            
+            localStorage.setItem('videos', yaml.stringify(meta));
         }
     };
     const uploadFiles = async () => {
@@ -37,15 +40,7 @@ export default function () {
         const result = await tauri.dialog.open({ directory: true });
         if (!result) return;
         const file_list = await service.getAllVideos(result);
-        for (const file of file_list) {
-            const result = await service.getVideoMeta(file);
-            console.log('result', result);
-            if (result.error) continue;
-            const meta = consts.fn.fmtMeta(result);
-            meta.thumbnail = await service.getThumbnail(file);
-
-            setList((prev) => [...prev, meta]);
-        }
+        await addList(file_list);
     };
     const clearFiles = () => setList([]);
 
@@ -83,7 +78,8 @@ export default function () {
             <main className='main'>
                 <ui.Space size='mini' style={{ marginBottom: '1em', display: 'flex', justifyContent: 'space-between' }}>
                     <ui.Button size='mini' onClick={uploadFiles} icon={<icon.IconUpload />}></ui.Button>
-                    <MediaDownload></MediaDownload>
+                    <MediaDownload />
+                    <MediaDownload />
                     <ui.Button size='mini' onClick={uploadFolder} icon={<icon.IconFolderAdd />}></ui.Button>
                     <ui.Button size='mini' onClick={clearFiles} icon={<icon.IconDelete />}></ui.Button>
                 </ui.Space>

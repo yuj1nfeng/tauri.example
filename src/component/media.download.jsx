@@ -4,10 +4,18 @@ import * as icon from '@arco-design/web-react/icon';
 export default function () {
     const openModal = () => {
         ui.Modal.info({
-            style: { padding: '8px 12px' },
+            style: { padding: '12px 12px' },
             title: '请输入视频链接地址',
-            content: <ui.Input placeholder='请输入视频链接' />,
+            content: <ui.Form children={<ui.Input placeholder='请输入视频链接' />} />,
             onOk: downloadMedia,
+            closable: true,
+            maskClosable: false,
+            autoFocus: true,
+            footer: () => (
+                <ui.Button type='secondary' style={{ width: '100%' }}>
+                    开始下载
+                </ui.Button>
+            ),
         });
     };
 
