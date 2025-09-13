@@ -1,4 +1,4 @@
-import ffmpeg from '#ffmpeg';
+import ffmpeg from '../utils/ffmpeg.js';
 import consts from '#consts';
 import { emitEvent } from '../middleware/sse.js';
 import dayjs from 'dayjs';

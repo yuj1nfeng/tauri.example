@@ -1,4 +1,4 @@
-import ffmpeg from '#ffmpeg';
+import ffmpeg from '../utils/ffmpeg.js';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { emitEvent } from '../middleware/sse.js';
@@ -25,7 +25,7 @@ export default async (ctx) => {
                 const duration = parseInt(video.duration);
                 if (duration < split_duration) {
                     handled += duration;
-                    await emitEvent(task_id, (((handled) / total_duration) * 100).toFixed(2));
+                    await emitEvent(task_id, ((handled / total_duration) * 100).toFixed(2));
                     await emitEvent(consts.events.warning, `${shotname} 小于 ${split_duration} 秒, 跳过`);
                     continue;
                 }
@@ -39,9 +39,9 @@ export default async (ctx) => {
                     const end_str = end.toString().padStart(4, '0');
                     const output_name = `${path.basename(video.filename, ext)}.${start_str}-${end_str}${ext}`;
                     const output_file = path.join(output_dir, output_name);
-                    await ffmpeg.sliceVideo(video.filename, output_file, { start, end });
-                    handled += (end - start);
-                    await emitEvent(task_id, (((handled) / total_duration) * 100).toFixed(2));
+                    await ffmpeg.sliceVideo(video.filename, output_file, { start, duration: split_duration });
+                    handled += end - start;
+                    await emitEvent(task_id, ((handled / total_duration) * 100).toFixed(2));
                 }
             }
 

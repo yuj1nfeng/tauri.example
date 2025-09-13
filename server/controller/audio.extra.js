@@ -1,4 +1,4 @@
-import ffmpeg from '#ffmpeg';
+import ffmpeg from '../utils/ffmpeg.js';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { emitEvent } from '../middleware/sse.js';
@@ -6,7 +6,7 @@ import dayjs from 'dayjs';
 import consts from '#consts';
 export default async (ctx) => {
     const body = await ctx.req.json();
-    const { videos, output_dir, audio_output_fmt, audio_codec, audio_bit_rate } = body;
+    const { videos, output_dir, output_fmt, audio_codec, audio_bit_rate } = body;
     if (!(await fs.exists(output_dir))) await fs.mkdir(output_dir, { recursive: true, force: true });
     const task_id = dayjs().format('YYYYMMDDHHmmss') + Math.floor(Math.random() * 1000);
     ctx.set('task_id', task_id);
@@ -21,11 +21,11 @@ export default async (ctx) => {
                 const duration = parseInt(video.duration);
                 if (!video.audio) {
                     handled += duration;
-                    await emitEvent(task_id, (((handled) / total_duration) * 100).toFixed(2));
+                    await emitEvent(task_id, ((handled / total_duration) * 100).toFixed(2));
                     await emitEvent(consts.events.warning, `${shotname} 无音频, 跳过`);
                     continue;
                 }
-                const output = path.join(output_dir, `${path.basename(video.filename, path.extname(video.filename))}.${audio_output_fmt}`);
+                const output = path.join(output_dir, `${path.basename(video.filename, path.extname(video.filename))}.${output_fmt}`);
                 await ffmpeg.extraAudio(video.filename, output, { progress_cb: progress_cb });
                 handled += Number(video.duration);
             }

@@ -1,4 +1,3 @@
-
 const base_url = 'http://localhost:3000';
 
 const getVideoMeta = async (input) => {
@@ -7,7 +6,7 @@ const getVideoMeta = async (input) => {
     const response = await fetch(req_url, {
         method: 'POST',
         headers: headers,
-        body: JSON.stringify({ input })
+        body: JSON.stringify({ input }),
     });
     const result = await response.json();
     return result;
@@ -19,12 +18,11 @@ const getAllVideos = async (input) => {
     const response = await fetch(req_url, {
         method: 'POST',
         headers: headers,
-        body: JSON.stringify({ input })
+        body: JSON.stringify({ input }),
     });
     const result = await response.json();
     return result;
 };
-
 
 const concatVideos = async (input) => {
     const req_url = `${base_url}/video.concat`;
@@ -32,7 +30,7 @@ const concatVideos = async (input) => {
     const response = await fetch(req_url, {
         method: 'POST',
         headers: headers,
-        body: JSON.stringify(input)
+        body: JSON.stringify(input),
     });
     const result = await response.json();
     return result;
@@ -44,12 +42,11 @@ const splitVideos = async (input) => {
     const response = await fetch(req_url, {
         method: 'POST',
         headers: headers,
-        body: JSON.stringify(input)
+        body: JSON.stringify(input),
     });
     const result = await response.json();
     return result;
 };
-
 
 const extraAudio = async (input) => {
     const req_url = `${base_url}/audio.extra`;
@@ -57,7 +54,19 @@ const extraAudio = async (input) => {
     const response = await fetch(req_url, {
         method: 'POST',
         headers: headers,
-        body: JSON.stringify(input)
+        body: JSON.stringify(input),
+    });
+    const result = await response.json();
+    return result;
+};
+
+const removeAudio = async (input) => {
+    const req_url = `${base_url}/audio.remove`;
+    const headers = { 'content-type': 'application/json' };
+    const response = await fetch(req_url, {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify(input),
     });
     const result = await response.json();
     return result;
@@ -69,7 +78,19 @@ const addWatermark = async (input) => {
     const response = await fetch(req_url, {
         method: 'POST',
         headers: headers,
-        body: JSON.stringify(input)
+        body: JSON.stringify(input),
+    });
+    const result = await response.json();
+    return result;
+};
+
+const audoCutVideos = async (input) => {
+    const req_url = `${base_url}/video.auto.cut`;
+    const headers = { 'content-type': 'application/json' };
+    const response = await fetch(req_url, {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify(input),
     });
     const result = await response.json();
     return result;
@@ -81,7 +102,7 @@ const getThumbnail = async (input) => {
     const response = await fetch(req_url, {
         method: 'POST',
         headers: headers,
-        body: JSON.stringify({ input })
+        body: JSON.stringify({ input }),
     });
     const result = await response.text();
     return result;
@@ -93,23 +114,21 @@ const playVideo = async (input) => {
     const response = await fetch(req_url, {
         method: 'POST',
         headers: headers,
-        body: JSON.stringify({ input })
+        body: JSON.stringify({ input }),
     });
     const result = await response.json();
     return result;
 };
 
-
-
-
 export default {
     getVideoMeta,
     getAllVideos,
     concatVideos,
+    audoCutVideos,
     extraAudio,
     getThumbnail,
     playVideo,
     splitVideos,
-    addWatermark
-
+    addWatermark,
+    removeAudio,
 };

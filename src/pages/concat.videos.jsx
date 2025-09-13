@@ -47,17 +47,27 @@ export default function ConcatVideos({ list }) {
         setPercent(0);
 
         values['videos'] = list;
-        const { task_id } = await service.concatVideos(values);
+        const { task_id } = await service.extraAudio(values);
         setCurrentTaskId(task_id);
         form.setFieldValue('output_file', null);
         sse.addEventListener(task_id, progressHandle);
+        sse.addEventListener(consts.events.error, () => setProcessing(false));
     };
     return (
-        <ui.Form  {...consts.config.formProps} form={form} initialValues={values} onValuesChange={setValues}>
-            <ui.Grid.Col span={12}>
-                <ui.Form.Item rules={[{ required: true, message: '请设置视频码率' }]} field='video_bit_rate' label='视频码率' children={<ui.Input />} />
-                <ui.Form.Item rules={[{ required: true, message: '请设置视频帧率' }]} field='video_frame_rate' label='视频帧率' children={<ui.Input />} />
-                <ui.Form.Item rules={[{ required: true, message: '请设置画面宽高' }]} field='video_size' label='画面宽高' children={<ui.Input />} />
+        <ui.Form {...consts.config.formProps} form={form} initialValues={values} onValuesChange={setValues}>
+            <ui.Grid.Col span={8}>
+                <ui.Form.Item
+                    rules={[{ required: true, message: '请设置视频码率' }]}
+                    field='video_bit_rate'
+                    label='视频码率'
+                    children={<ui.Input autoWidth={{ minWidth: '180px' }} />}
+                />
+                <ui.Form.Item
+                    rules={[{ required: true, message: '请设置视频帧率' }]}
+                    field='video_frame_rate'
+                    label='视频帧率'
+                    children={<ui.Input autoWidth={{ minWidth: '180px' }} />}
+                />
                 <ui.Form.Item
                     rules={[{ required: true, message: '请设置视频编码' }]}
                     field='video_codec'
@@ -65,10 +75,34 @@ export default function ConcatVideos({ list }) {
                     children={<ui.Select options={options.video_codec} autoWidth={{ minWidth: '180px' }} />}
                 />
             </ui.Grid.Col>
+            <ui.Grid.Col span={8}>
+                <ui.Form.Item
+                    rules={[{ required: true, message: '请设置画面宽高' }]}
+                    field='video_size'
+                    label='输出大小'
+                    children={<ui.Input autoWidth={{ minWidth: '180px' }} />}
+                />
+                <ui.Form.Item
+                    rules={[{ required: true, message: '请设置输出格式' }]}
+                    field='output_fmt'
+                    label='输出格式'
+                    children={<ui.Select options={options.video_output_fmt} autoWidth={{ minWidth: '180px' }} />}
+                />
+            </ui.Grid.Col>
 
-            <ui.Grid.Col span={12}>
-                <ui.Form.Item rules={[{ required: true, message: '请设置音频采样率' }]} field='audio_sample_rate' label='音频采样率' children={<ui.Input />} />
-                <ui.Form.Item rules={[{ required: true, message: '请设置音频通道数' }]} field='audio_channels' label='音频通道数' children={<ui.InputNumber />} />
+            <ui.Grid.Col span={8}>
+                <ui.Form.Item
+                    rules={[{ required: true, message: '请设置音频采样率' }]}
+                    field='audio_sample_rate'
+                    label='音频采样率'
+                    children={<ui.Input autoWidth={{ minWidth: '180px' }} />}
+                />
+                <ui.Form.Item
+                    rules={[{ required: true, message: '请设置音频通道数' }]}
+                    field='audio_channels'
+                    label='音频通道数'
+                    children={<ui.InputNumber autoWidth={{ minWidth: '180px' }} />}
+                />
                 <ui.Form.Item
                     rules={[{ required: true, message: '请设置音频编码器' }]}
                     field='audio_codec'
@@ -78,12 +112,11 @@ export default function ConcatVideos({ list }) {
             </ui.Grid.Col>
             <ui.Grid.Col span={24}>
                 <ui.Form.Item
-                    rules={[{ required: true, message: '请设置输出格式' }]}
-                    field='output_fmt'
-                    label='输出格式'
-                    children={<ui.Select options={options.video_output_fmt} autoWidth={{ minWidth: '180px' }} />}
+                    rules={[{ required: true, message: '请设置输出文件' }]}
+                    field='output_file'
+                    label='输出文件'
+                    children={<ui.Input onClick={setOutputFile} autoWidth={{ minWidth: '380px' }} />}
                 />
-                <ui.Form.Item rules={[{ required: true, message: '请设置输出文件' }]} field='output_file' label='输出文件' children={<ui.Input onClick={setOutputFile} />} />
             </ui.Grid.Col>
             <ProgressBtn
                 onClick={startHandle}
@@ -93,7 +126,8 @@ export default function ConcatVideos({ list }) {
                 disabled={list.length === 0}
                 children={processing ? '处理中' : '开始处理'}
                 type='primary'
-                style={{ width: '100%' }} />
+                style={{ width: '100%' }}
+            />
         </ui.Form>
     );
 }

@@ -1,4 +1,4 @@
-import ffmpeg from '#ffmpeg';
+import ffmpeg from '../utils/ffmpeg.js';
 import fs from 'node:fs/promises';
 export default async (ctx) => {
     const body = await ctx.req.json();

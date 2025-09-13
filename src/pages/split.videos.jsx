@@ -18,15 +18,8 @@ export default function ConcatVideos({ list }) {
         if (parseInt(data) === 100) {
             setProcessing(false);
             utils.sse.removeEventListener(currnet_task_id, progressHandle);
-
         }
     };
-
-    React.useEffect(() => {
-        window.addEventListener('concat-progress', progressHandle);
-        // return () => window.removeEventListener('concat-progress', progressHandle);
-    }, []);
-
     const setOutputDir = async (e) => {
         const result = await tauri.dialog.open({ directory: true });
         if (!result) return;
@@ -42,6 +35,7 @@ export default function ConcatVideos({ list }) {
         const { task_id } = await utils.service.splitVideos(values);
         setCurrentTaskId(task_id);
         utils.sse.addEventListener(task_id, progressHandle);
+        utils.sse.addEventListener(consts.events.error, () => setProcessing(false));
     };
     return (
         <ui.Form {...consts.config.formProps} form={form} initialValues={values} onValuesChange={setValues}>
@@ -49,25 +43,17 @@ export default function ConcatVideos({ list }) {
                 field='split_duration'
                 rules={[{ required: true, message: '请设置输出目录' }]}
                 label='切片时长'
-                children={<ui.Slider
-                    placeholder='请选择切片时长'
-                    step={5}
-                    min={5}
-                    max={150}
-                    defaultValue={60}
-                    formatTooltip={(number) => `${number} 秒`}
-                    style={{ width: '240px' }}
-                />} />
+                children={
+                    <ui.Slider placeholder='请选择切片时长' step={5} min={5} max={150} defaultValue={60} formatTooltip={(number) => `${number} 秒`} style={{ width: '240px' }} />
+                }
+            />
 
             <ui.Form.Item
                 field='output_dir'
                 rules={[{ required: true, message: '请设置输出目录' }]}
                 label='输出目录'
-                children={<ui.Input
-                    onClick={setOutputDir}
-                    placeholder='请选择输出目录'
-                    defaultValue='~/Videos'
-                    style={{ width: '380px' }} />} />
+                children={<ui.Input onClick={setOutputDir} placeholder='请选择输出目录' defaultValue='~/Videos' style={{ width: '380px' }} />}
+            />
 
             <ProgressBtn
                 onClick={startHandle}
@@ -77,7 +63,8 @@ export default function ConcatVideos({ list }) {
                 disabled={list.length === 0}
                 children={processing ? '处理中' : '开始处理'}
                 type='primary'
-                style={{ width: '100%' }} />
+                style={{ width: '100%' }}
+            />
         </ui.Form>
     );
 }

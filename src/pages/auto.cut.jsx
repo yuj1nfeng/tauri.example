@@ -1,105 +1,145 @@
-
-
 import React from 'react';
 import tauri from '../utils/tauri.js';
 import service from '../utils/service.js';
+import sse from '../utils/sse.js';
 import * as ui from '@arco-design/web-react';
-import consts from '#consts';
-
+import dayjs from 'dayjs';
+import consts, { options } from '#consts';
+import ProgressBtn from './progress.btn.jsx';
 
 export default function ConcatVideos({ list }) {
+    const [currnet_task_id, setCurrentTaskId] = React.useState(null);
     const [processing, setProcessing] = React.useState(false);
     const [percent, setPercent] = React.useState([]);
     const [values, setValues] = React.useState({
         video_codec: 'h264',
         output_fmt: 'mp4',
-        output_dir: '~/Videos',
         video_frame_rate: 15,
         video_bit_rate: 1000,
         video_size: '1920x1080',
         audio_codec: 'aac',
         audio_sample_rate: 44100,
         audio_channels: 2,
+        split_duration: [5, 10],
     });
     const [form] = ui.Form.useForm();
 
-    const progressHandle = (event) => {
-        setPercent(event.detail);
+    const progressHandle = (data) => {
+        setPercent(data);
+        if (parseInt(data) === 100) {
+            setProcessing(false);
+            sse.removeEventListener(currnet_task_id);
+        }
     };
 
-    React.useEffect(() => {
-        window.addEventListener('concat-progress', progressHandle);
-        // return () => window.removeEventListener('concat-progress', progressHandle);
-    }, []);
-
-
-
-
     const setOutputFile = async (e) => {
-        const result = await tauri.dialog.save({ title: '请选择保存路径', defaultPath: `concat.${values.output_fmt}` });
+        const values = form.getFieldsValue();
+        const output_fmt = values.output_fmt;
+        const default_path = `${dayjs().format('YYYYMMDDHHmmss')}.auto.${output_fmt}`;
+        const result = await tauri.dialog.save({ title: '请选择保存路径', defaultPath: default_path });
         if (!result) return;
         form.setFieldValue('output_file', result.replaceAll('\\', '/'));
     };
 
     const startHandle = async () => {
+        sse.check();
+        const values = await form.validate();
         setProcessing(true);
         setPercent(0);
-        const values = form.getFieldsValue();
-        console.log('values', values);
-        console.log('videos', list);
-        values['videos'] = list;
-        const result = await service.concatVideos(values);
-        console.log('result', result);
-        setProcessing(false);
-        setPercent(100);
 
+        values['videos'] = list;
+        const { task_id } = await service.audoCutVideos(values);
+        setCurrentTaskId(task_id);
+        form.setFieldValue('output_file', null);
+        sse.addEventListener(task_id, progressHandle);
+        sse.addEventListener(consts.events.error, () => setProcessing(false));
     };
     return (
-        <ui.Form {...consts.config.formProps}>
+        <ui.Form {...consts.config.formProps} form={form} initialValues={values} onValuesChange={setValues}>
             <ui.Grid.Col span={24}>
-                <ui.Progress percent={percent} width='100%' style={{ display: processing ? 'inline-block' : 'none' }} />
-            </ui.Grid.Col>
-
-            <ui.Grid.Col span={24} children={<ui.Form.Item label='缩放比例' children={<ui.Input placeholder='缩放比例' />} />}>
                 <ui.Form.Item
+                    tooltip='设置每个视频文件截取的片段长短,如视频时长小于设置的最小时长则跳过该视频'
+                    field='split_duration'
                     label='片段时长'
                     children={
-                        <ui.Slider
-                            placeholder='请选择片段时长'
-                            range={true}
-                            step={1}
-                            min={5}
-                            max={60}
-                            defaultValue={[5, 10]}
-                            formatTooltip={(number) => `${number} 秒`}
-                            showInput={{ suffix: 's' }}
-                            style={{ minWidth: '566px' }}
-                        />
+                        <ui.Slider range={true} step={1} min={5} max={60} formatTooltip={(number) => `${number} 秒`} showInput={{ suffix: 's' }} style={{ minWidth: '400px' }} />
                     }
                 />
             </ui.Grid.Col>
 
-            <ui.Grid.Col span={8} children={<ui.Form.Item label='缩放比例' children={<ui.Input />} />}>
-                <ui.Form.Item label='视频码率' children={<ui.Select autoWidth={{ minWidth: '180px' }} />} />
-                <ui.Form.Item label='视频帧率' children={<ui.Select autoWidth={{ minWidth: '180px' }} />} />
-                <ui.Form.Item label='画面宽高' children={<ui.Select autoWidth={{ minWidth: '180px' }} />} />
-                <ui.Form.Item label='视频编码' children={<ui.Select autoWidth={{ minWidth: '180px' }} />} />
+            <ui.Grid.Col span={8}>
+                <ui.Form.Item
+                    rules={[{ required: true, message: '请设置视频码率' }]}
+                    field='video_bit_rate'
+                    label='视频码率'
+                    children={<ui.Input autoWidth={{ minWidth: '180px' }} />}
+                />
+                <ui.Form.Item
+                    rules={[{ required: true, message: '请设置视频帧率' }]}
+                    field='video_frame_rate'
+                    label='视频帧率'
+                    children={<ui.Input autoWidth={{ minWidth: '180px' }} />}
+                />
+                <ui.Form.Item
+                    rules={[{ required: true, message: '请设置视频编码' }]}
+                    field='video_codec'
+                    label='视频编码'
+                    children={<ui.Select options={options.video_codec} autoWidth={{ minWidth: '180px' }} />}
+                />
+            </ui.Grid.Col>
+            <ui.Grid.Col span={8}>
+                <ui.Form.Item
+                    rules={[{ required: true, message: '请设置画面宽高' }]}
+                    field='video_size'
+                    label='输出大小'
+                    children={<ui.Input autoWidth={{ minWidth: '180px' }} />}
+                />
+                <ui.Form.Item
+                    rules={[{ required: true, message: '请设置输出格式' }]}
+                    field='output_fmt'
+                    label='输出格式'
+                    children={<ui.Select options={options.video_output_fmt} autoWidth={{ minWidth: '180px' }} />}
+                />
             </ui.Grid.Col>
 
-            <ui.Grid.Col span={8} children={<ui.Form.Item label='缩放比例' children={<ui.Input />} />}>
-                <ui.Form.Item label='音频采样率' children={<ui.Select autoWidth={{ minWidth: '180px' }} />} />
-                <ui.Form.Item label='音频通道数' children={<ui.Select autoWidth={{ minWidth: '180px' }} />} />
-                <ui.Form.Item label='音频编码器' children={<ui.Select autoWidth={{ minWidth: '180px' }} />} />
-            </ui.Grid.Col>
-            <ui.Grid.Col span={8} children={<ui.Form.Item label='缩放比例' children={<ui.Input />} />}>
-                <ui.Form.Item label='输出格式' children={<ui.Select autoWidth={{ minWidth: '180px' }} />} />
-                <ui.Form.Item label='输出目录 ' children={<ui.Input autoWidth={{ minWidth: '180px' }} />} />
+            <ui.Grid.Col span={8}>
+                <ui.Form.Item
+                    rules={[{ required: true, message: '请设置音频采样率' }]}
+                    field='audio_sample_rate'
+                    label='音频采样率'
+                    children={<ui.Input autoWidth={{ minWidth: '180px' }} />}
+                />
+                <ui.Form.Item
+                    rules={[{ required: true, message: '请设置音频通道数' }]}
+                    field='audio_channels'
+                    label='音频通道数'
+                    children={<ui.InputNumber autoWidth={{ minWidth: '180px' }} />}
+                />
+                <ui.Form.Item
+                    rules={[{ required: true, message: '请设置音频编码器' }]}
+                    field='audio_codec'
+                    label='音频编码器'
+                    children={<ui.Select options={options.audio_codec} autoWidth={{ minWidth: '180px' }} />}
+                />
             </ui.Grid.Col>
             <ui.Grid.Col span={24}>
-                <ui.Button loading={processing} onClick={startHandle} type='primary' style={{ width: '100%' }}>
-                    开始处理
-                </ui.Button>
+                <ui.Form.Item
+                    rules={[{ required: true, message: '请设置输出文件' }]}
+                    field='output_file'
+                    label='输出文件'
+                    children={<ui.Input onClick={setOutputFile} autoWidth={{ minWidth: '380px' }} />}
+                />
             </ui.Grid.Col>
+            <ProgressBtn
+                onClick={startHandle}
+                size='small'
+                loading={processing}
+                progress={percent}
+                disabled={list.length === 0}
+                children={processing ? '处理中' : '开始处理'}
+                type='primary'
+                style={{ width: '100%' }}
+            />
         </ui.Form>
     );
 }

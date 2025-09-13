@@ -16,16 +16,25 @@ import SplitVideos from './pages/split.videos.jsx';
 export default function () {
     const [list, setList] = React.useState([]);
     React.useEffect(() => sse.check());
-    const uploadFiles = async () => {
-        const result = await tauri.dialog.open({ filters: [{ name: 'videos', extensions: ['mp4', 'mov'] }], multiple: true });
-        for (const file of result) {
+
+    const addList = async (file_list) => {
+        const exists_list = list.map((p) => p.filename);
+        for (const file of file_list) {
+            if (exists_list.includes(file)) continue;
             const result = await service.getVideoMeta(file);
             if (result.error) continue;
             const meta = consts.fn.fmtMeta(result);
-            console.log(meta);
             meta.thumbnail = await service.getThumbnail(file);
             setList((prev) => [...prev, meta]);
         }
+    };
+    const uploadFiles = async () => {
+        const file_list = await tauri.dialog.open({ filters: [{ name: 'videos', extensions: ['mp4', 'mov'] }], multiple: true });
+        await addList(file_list);
+    };
+    const downloadFile = async () => {
+        const file_list = await tauri.dialog.open({ filters: [{ name: 'videos', extensions: ['mp4', 'mov'] }], multiple: true });
+        await addList(file_list);
     };
 
     const uploadFolder = async () => {
@@ -78,17 +87,19 @@ export default function () {
             <main className='main'>
                 <ui.Space size='mini' style={{ marginBottom: '1em', display: 'flex', justifyContent: 'space-between' }}>
                     <ui.Button size='mini' onClick={uploadFiles} icon={<icon.IconUpload />}></ui.Button>
+                    <ui.Button size='mini' onClick={downloadFile} icon={<icon.IconCloudDownload />}></ui.Button>
                     <ui.Button size='mini' onClick={uploadFolder} icon={<icon.IconFolderAdd />}></ui.Button>
                     <ui.Button size='mini' onClick={clearFiles} icon={<icon.IconDelete />}></ui.Button>
                 </ui.Space>
                 <ui.List size='small' style={{ height: '34vh', padding: '0 20px' }} dataSource={list} render={renderItem} />
-                <ui.Tabs defaultActiveTab='2'>
+                <ui.Tabs defaultActiveTab='4'>
                     <ui.Tabs.TabPane key='1' title='视频切片' children={<SplitVideos list={list} />} />
                     <ui.Tabs.TabPane key='2' title='添加水印' children={<AddWatermark list={list} />} />
                     <ui.Tabs.TabPane key='3' title='视频拼接' children={<ConcatVideos list={list} />} />
-                    <ui.Tabs.TabPane key='4' title='音频去除' children={<RemoveAudio list={list} />} />
-                    <ui.Tabs.TabPane key='5' title='自动混剪' children={<AutoCut list={list} />} />
-                    <ui.Tabs.TabPane key='6' title='视频切片' children={<SplitVideos list={list} />} />
+                    <ui.Tabs.TabPane key='4' title='音频提取' children={<ExtraAudio list={list} />} />
+                    <ui.Tabs.TabPane key='5' title='音频去除' children={<RemoveAudio list={list} />} />
+                    <ui.Tabs.TabPane key='6' title='自动混剪' children={<AutoCut list={list} />} />
+                    <ui.Tabs.TabPane key='7' title='视频切片' children={<SplitVideos list={list} />} />
                 </ui.Tabs>
             </main>
             <footer style={{ position: 'absolute', bottom: 0, left: 0, zIndex: 1, cursor: 'pointer', color: '#3e3e3e', fontSize: '8px' }}>

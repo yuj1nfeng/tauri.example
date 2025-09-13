@@ -6,13 +6,12 @@ import * as ui from '@arco-design/web-react';
 import consts from '#consts';
 import ProgressBtn from './progress.btn.jsx';
 
-
 export default function ({ list }) {
     const [currnet_task_id, setCurrentTaskId] = React.useState(null);
     const [processing, setProcessing] = React.useState(false);
     const [percent, setPercent] = React.useState([]);
     const [values, setValues] = React.useState({
-        audio_output_fmt: 'mp3',
+        output_fmt: 'mp3',
         audio_codec: 'mp3',
         audio_sample_rate: 44100,
         audio_channels: 2,
@@ -42,13 +41,24 @@ export default function ({ list }) {
         const { task_id } = await service.extraAudio(values);
         setCurrentTaskId(task_id);
         sse.addEventListener(task_id, progressHandle);
+        sse.addEventListener(consts.events.error, () => setProcessing(false));
     };
     return (
         <ui.Form {...consts.config.formProps} form={form} initialValues={values} onValuesChange={setValues}>
+            <ui.Form.Item
+                rules={[{ required: true, message: '请设置输出格式' }]}
+                field='output_fmt'
+                label='输出格式'
+                children={<ui.Select options={consts.options.output_fmt} autoWidth={{ minWidth: '180px' }} />}
+            />
 
-            <ui.Form.Item rules={[{ required: true, message: '请设置输出格式' }]} field='audio_output_fmt' label='输出格式' children={<ui.Select options={consts.options.audio_output_fmt} autoWidth={{ minWidth: '180px' }} />} />
-
-            <ui.Form.Item rules={[{ required: true, message: '请设置输出目录' }]} field='output_dir' label='输出目录' onClick={setOutputDir} children={<ui.Input autoWidth={{ minWidth: '360px' }} />} />
+            <ui.Form.Item
+                rules={[{ required: true, message: '请设置输出目录' }]}
+                field='output_dir'
+                label='输出目录'
+                onClick={setOutputDir}
+                children={<ui.Input autoWidth={{ minWidth: '360px' }} />}
+            />
 
             <ProgressBtn
                 onClick={startHandle}
@@ -58,7 +68,8 @@ export default function ({ list }) {
                 disabled={list.length === 0}
                 children={processing ? '处理中' : '开始处理'}
                 type='primary'
-                style={{ width: '100%' }} />
+                style={{ width: '100%' }}
+            />
         </ui.Form>
     );
 }

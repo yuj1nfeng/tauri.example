@@ -1,13 +1,14 @@
-import ffmpeg from '#ffmpeg';
+import ffmpeg from '../utils/ffmpeg.js';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { emitEvent } from '../middleware/sse.js';
 import dayjs from 'dayjs';
 import consts from '#consts';
+import utils from '../utils/index.js';
 
 export default async (ctx) => {
     const body = await ctx.req.json();
-    const { videos, output_dir, output_fmt, position, scale, opacity = 1 } = body;
+    const { videos, output_dir, output_fmt, position, scale, opacity, watermark } = body;
     if (!(await fs.exists(output_dir))) await fs.mkdir(output_dir, { recursive: true, force: true });
     const task_id = dayjs().format('YYYYMMDDHHmmss') + Math.floor(Math.random() * 1000);
     ctx.set('task_id', task_id);
@@ -15,6 +16,8 @@ export default async (ctx) => {
     let handled = 0;
     const progress_cb = async (progress) => await emitEvent(task_id, (((progress.current + handled) / total_duration) * 100).toFixed(2));
     await emitEvent(consts.events.info, `开始处理,共 ${videos.length} 个视频, 总时长 ${total_duration.toFixed(2)} 秒`);
+    const { path: watermark_file } = await utils.base64ToFile(watermark);
+
     (async () => {
         try {
             for (const video of videos) {
@@ -25,12 +28,12 @@ export default async (ctx) => {
                     await emitEvent(consts.events.warning, `${shotname} 无视频, 跳过`);
                     continue;
                 }
-                const watermark = 'd:/test/1.png';
                 const output_name = `${path.basename(video.filename, ext)}.watermark.${output_fmt}`;
                 const output_file = path.join(output_dir, output_name);
-                await ffmpeg.addWatermark(video.filename, watermark, output_file, { position, scale, opacity, progress_cb: progress_cb });
+                await ffmpeg.addWatermark(video.filename, watermark_file, output_file, { position, scale, opacity, progress_cb: progress_cb });
                 handled += duration;
             }
+            await fs.unlink(watermark_file);
             await emitEvent(consts.events.info, '处理完成');
         } catch (error) {
             await emitEvent(consts.events.error, error.message);
