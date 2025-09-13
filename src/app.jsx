@@ -12,6 +12,7 @@ import AutoCut from './pages/auto.cut.jsx';
 import ExtraAudio from './pages/extra.audio.jsx';
 import RemoveAudio from './pages/remove.audio.jsx';
 import SplitVideos from './pages/split.videos.jsx';
+import MediaDownload from './pages/media.download.jsx';
 
 export default function () {
     const [list, setList] = React.useState([]);
@@ -32,11 +33,6 @@ export default function () {
         const file_list = await tauri.dialog.open({ filters: [{ name: 'videos', extensions: ['mp4', 'mov'] }], multiple: true });
         await addList(file_list);
     };
-    const downloadFile = async () => {
-        const file_list = await tauri.dialog.open({ filters: [{ name: 'videos', extensions: ['mp4', 'mov'] }], multiple: true });
-        await addList(file_list);
-    };
-
     const uploadFolder = async () => {
         const result = await tauri.dialog.open({ directory: true });
         if (!result) return;
@@ -87,7 +83,7 @@ export default function () {
             <main className='main'>
                 <ui.Space size='mini' style={{ marginBottom: '1em', display: 'flex', justifyContent: 'space-between' }}>
                     <ui.Button size='mini' onClick={uploadFiles} icon={<icon.IconUpload />}></ui.Button>
-                    <ui.Button size='mini' onClick={downloadFile} icon={<icon.IconCloudDownload />}></ui.Button>
+                    <MediaDownload></MediaDownload>
                     <ui.Button size='mini' onClick={uploadFolder} icon={<icon.IconFolderAdd />}></ui.Button>
                     <ui.Button size='mini' onClick={clearFiles} icon={<icon.IconDelete />}></ui.Button>
                 </ui.Space>

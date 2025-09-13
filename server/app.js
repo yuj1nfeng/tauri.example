@@ -17,6 +17,7 @@ app.post('/video.thumbnail', await import('./controller/video.thumbnail.js').the
 app.post('/video.split', await import('./controller/video.split.js').then((m) => m.default));
 app.post('/video.add.watermark', await import('./controller/video.add.watermark.js').then((m) => m.default));
 app.post('/video.auto.cut', await import('./controller/video.auto.cut.js').then((m) => m.default));
+app.post('/media.download', await import('./controller/media.download.js').then((m) => m.default));
 
 app.get('/', async (c) => {
     c.set('hello', 'world');
