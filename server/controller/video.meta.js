@@ -5,7 +5,6 @@ export default async (ctx) => {
     const { input } = body;
     const stat = await fs.stat(input);
     if (!stat.isFile()) return ctx.json('');
-
     const result = await ffmpeg.getMetadata(input);
     return ctx.json(result);
 };

@@ -1,60 +1,65 @@
 import React from 'react';
-import tauri from '../utils/tauri.js';
-import service from '../utils/service.js';
-import sse from '../utils/sse.js';
+import utils, { tauri, consts, sse } from '../utils/index.js';
 import * as ui from '@arco-design/web-react';
 import dayjs from 'dayjs';
-import consts, { options } from '#consts';
 import ProgressBtn from './progress.btn.jsx';
+const { options } = consts;
+
+const namespace = new URL(import.meta.url).pathname;
+
+
 
 export default function ConcatVideos({ list }) {
-    const [currnet_task_id, setCurrentTaskId] = React.useState(null);
-    const [processing, setProcessing] = React.useState(false);
-    const [percent, setPercent] = React.useState([]);
-    const [values, setValues] = React.useState({
-        video_codec: 'h264',
-        output_fmt: 'mp4',
-        video_frame_rate: 15,
-        video_bit_rate: 1000,
-        video_size: '1920x1080',
-        audio_codec: 'aac',
-        audio_sample_rate: 44100,
-        audio_channels: 2,
-    });
+    const [state, setState] = React.useState(utils.kv.withNamespace(namespace).get('state'));
     const [form] = ui.Form.useForm();
+    const init = async () => {
+        console.log(namespace + '\tinit');
+        sse.check();
+        setState((prev) => ({ ...prev, 'processing': false, 'percent': 0 }));
+        const { task_id } = state;
+        console.log('task_id:', task_id);
+        if (!task_id) return;
+        sse.addEventListener(task_id, progressHandle);
+        return () => {
+            console.log('destory');
+        };
+    };
+
+
+    React.useEffect(() => init, []);
+    React.useEffect(() => { utils.kv.withNamespace(namespace).set('state')(state); }, [state]);
+
 
     const progressHandle = (data) => {
-        setPercent(data);
+        const percent = Number(data);
+        setState((prev) => ({ ...prev, 'percent': percent }));
         if (parseInt(data) === 100) {
-            setProcessing(false);
-            sse.removeEventListener(currnet_task_id);
+            utils.sse.removeEventListener(state.task_id, progressHandle);
+            setState((prev) => ({ ...prev, 'processing': false, percent: 0, task_id: null }));
         }
     };
 
-    const setOutputFile = async (e) => {
-        const values = form.getFieldsValue();
-        const output_fmt = values.output_fmt;
-        const default_path = `${dayjs().format('YYYYMMDDHHmmss')}.concat.${output_fmt}`;
-        const result = await tauri.dialog.save({ title: '请选择保存路径', defaultPath: default_path });
+    const setOutputDir = async (e) => {
+        const result = await tauri.dialog.open({ directory: true });
         if (!result) return;
-        form.setFieldValue('output_file', result.replaceAll('\\', '/'));
+        form.setFieldValue('output_dir', result.replace(/\\/g, '/'));
     };
 
     const startHandle = async () => {
+
         sse.check();
         const values = await form.validate();
-        setProcessing(true);
-        setPercent(0);
-
+        setState((prev) => ({ ...prev, 'processing': true, percent: 0 }));
         values['videos'] = list;
-        const { task_id } = await service.extraAudio(values);
-        setCurrentTaskId(task_id);
-        form.setFieldValue('output_file', null);
+        const file_name = `${dayjs().format('YYYYMMDDHHmmss')}.CONCAT.${values.output_fmt}`;
+        values['output_file'] = `${values.output_dir}/${file_name}`;
+        const { task_id } = await utils.ext.invoke('video.concat', values);
+        setState((prev) => ({ ...prev, 'task_id': task_id }));
         sse.addEventListener(task_id, progressHandle);
-        sse.addEventListener(consts.events.error, () => setProcessing(false));
+        sse.addEventListener(consts.events.error, () => setState((prev) => ({ ...prev, 'processing': false, 'percent': 0 })));
     };
     return (
-        <ui.Form {...consts.config.formProps} form={form} initialValues={values} onValuesChange={setValues}>
+        <ui.Form {...consts.config.formProps} form={form} initialValues={state?.values} onValuesChange={(_, values) => setState((prev) => ({ ...prev, 'values': values }))}>
             <ui.Grid.Col span={8}>
                 <ui.Form.Item
                     rules={[{ required: true, message: '请设置视频码率' }]}
@@ -112,19 +117,20 @@ export default function ConcatVideos({ list }) {
             </ui.Grid.Col>
             <ui.Grid.Col span={24}>
                 <ui.Form.Item
-                    rules={[{ required: true, message: '请设置输出文件' }]}
-                    field='output_file'
-                    label='输出文件'
-                    children={<ui.Input onClick={setOutputFile} autoWidth={{ minWidth: '380px' }} />}
+                    rules={[{ required: true, message: '请设置输出目录' }]}
+                    field='output_dir'
+                    label=' 输出目录'
+                    onClick={setOutputDir}
+                    children={<ui.Input autoWidth={{ minWidth: '260px' }} />}
                 />
             </ui.Grid.Col>
             <ProgressBtn
                 onClick={startHandle}
                 size='small'
-                loading={processing}
-                progress={percent}
+                loading={state?.processing || false}
+                progress={state?.percent || 0}
                 disabled={list.length === 0}
-                children={processing ? '处理中' : '开始处理'}
+                children={state?.processing ? '处理中' : '开始处理'}
                 type='primary'
                 style={{ width: '100%' }}
             />

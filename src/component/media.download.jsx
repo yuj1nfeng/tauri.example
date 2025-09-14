@@ -12,7 +12,7 @@ export default function () {
             maskClosable: false,
             autoFocus: true,
             footer: () => (
-                <ui.Button type='secondary' style={{ width: '100%' }}>
+                <ui.Button type='primary' onClick={downloadMedia} style={{ width: '100%' }}>
                     开始下载
                 </ui.Button>
             ),

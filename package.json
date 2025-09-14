@@ -13,7 +13,7 @@
         "build": "bun script/build.js && vite build",
         "pack": "tauri build",
         "start": "tauri dev",
-        "server": "bun server/app.js",
+        "server": "bun --watch server/app.js",
         "preview": "vite preview",
         "tauri": "tauri"
     },

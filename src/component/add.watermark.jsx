@@ -1,24 +1,35 @@
 import React from 'react';
-import tauri from '../utils/tauri.js';
-import service from '../utils/service.js';
-import utils from '../utils/index.js';
-import sse from '../utils/sse.js';
 import * as ui from '@arco-design/web-react';
-import consts from '#consts';
+import utils, { sse, tauri, consts } from '../utils/index.js';
 import ProgressBtn from './progress.btn.jsx';
 
+const namespace = new URL(import.meta.url).pathname;
 export default function ConcatVideos({ list }) {
-    const [currnet_task_id, setCurrentTaskId] = React.useState(null);
-    const [processing, setProcessing] = React.useState(false);
-    const [percent, setPercent] = React.useState([]);
-    const [values, setValues] = React.useState({ video_codec: 'h264', output_fmt: 'mp4', position: 'left-top', scale: 0.2, opacity: 0.5 });
+    const [state, setState] = React.useState(utils.kv.withNamespace(namespace).get('state'));
     const [form] = ui.Form.useForm();
+    const init = async () => {
+        console.log(namespace + '\tinit');
+        sse.check();
+        setState((prev) => ({ ...prev, 'processing': false, 'percent': 0 }));
+        const { task_id } = state;
+        console.log('task_id:', task_id);
+        if (!task_id) return;
+        sse.addEventListener(task_id, progressHandle);
+        return () => {
+            console.log('destory');
+        };
+    };
+
+    React.useEffect(() => init, []);
+    React.useEffect(() => { utils.kv.withNamespace(namespace).set('state')(state); }, [state]);
+
 
     const progressHandle = (data) => {
-        setPercent(data);
+        const percent = Number(data);
+        setState((prev) => ({ ...prev, 'percent': percent }));
         if (parseInt(data) === 100) {
-            setProcessing(false);
-            sse.removeEventListener(currnet_task_id);
+            utils.sse.removeEventListener(state.task_id, progressHandle);
+            setState((prev) => ({ ...prev, 'processing': false, percent: 0, task_id: null }));
         }
     };
     const setOutputDir = async (e) => {
@@ -30,17 +41,17 @@ export default function ConcatVideos({ list }) {
     const startHandle = async () => {
         sse.check();
         const values = await form.validate();
-        setProcessing(true);
-        setPercent(0);
+        setState((prev) => ({ ...prev, 'processing': true, percent: 0 }));
         values['videos'] = list;
         values['watermark'] = await utils.ext.imageToBase64(values['watermark_files'][0].originFile);
-        const { task_id } = await service.addWatermark(values);
-        setCurrentTaskId(task_id);
+        const { task_id } = await utils.ext.invoke('video.add.watermark', values);
+        setState((prev) => ({ ...prev, 'task_id': task_id }));
         sse.addEventListener(task_id, progressHandle);
-        sse.addEventListener(consts.events.error, () => setProcessing(false));
+        sse.addEventListener(consts.events.error, () => setState((prev) => ({ ...prev, 'processing': false, 'percent': 0 })));
     };
+
     return (
-        <ui.Form {...consts.config.formProps} form={form} initialValues={values} onValuesChange={setValues}>
+        <ui.Form {...consts.config.formProps} form={form} initialValues={state?.values} onValuesChange={(_, values) => setState((prev) => ({ ...prev, 'values': values }))}>
             <ui.Grid.Col span={6}>
                 <ui.Form.Item
                     rules={[{ required: true, message: '请设置水印图片' }]}
@@ -88,10 +99,10 @@ export default function ConcatVideos({ list }) {
             <ProgressBtn
                 onClick={startHandle}
                 size='small'
-                loading={processing}
-                progress={percent}
+                loading={state?.processing || false}
+                progress={state?.percent || 0}
                 disabled={list.length === 0}
-                children={processing ? '处理中' : '开始处理'}
+                children={state?.processing ? '处理中' : '开始处理'}
                 type='primary'
                 style={{ width: '100%' }}
             />

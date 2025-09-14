@@ -1,26 +1,36 @@
 import React from 'react';
-import tauri from '../utils/tauri.js';
-import service from '../utils/service.js';
-import sse from '../utils/sse.js';
 import * as ui from '@arco-design/web-react';
-import consts from '#consts';
 import ProgressBtn from './progress.btn.jsx';
+import utils, { tauri, consts, sse } from '../utils/index.js';
+
+const namespace = new URL(import.meta.url).pathname;
 
 export default function ({ list }) {
-    const [currnet_task_id, setCurrentTaskId] = React.useState(null);
-    const [processing, setProcessing] = React.useState(false);
-    const [percent, setPercent] = React.useState([]);
-    const [values, setValues] = React.useState({ output_fmt: 'mp4', video_codec: 'mp4' });
+    const [state, setState] = React.useState(utils.kv.withNamespace(namespace).get('state'));
     const [form] = ui.Form.useForm();
+    const init = async () => {
+        console.log(namespace + '\tinit');
+        sse.check();
+        setState((prev) => ({ ...prev, 'processing': false, 'percent': 0 }));
+        const { task_id } = state;
+        console.log('task_id:', task_id);
+        if (!task_id) return;
+        sse.addEventListener(task_id, progressHandle);
+        return () => {
+            console.log('destory');
+        };
+    };
+    React.useEffect(() => init, []);
+    React.useEffect(() => { utils.kv.withNamespace(namespace).set('state')(state); }, [state]);
 
     const progressHandle = (data) => {
-        setPercent(data);
+        const percent = Number(data);
+        setState((prev) => ({ ...prev, 'percent': percent }));
         if (parseInt(data) === 100) {
-            sse.removeEventListener(currnet_task_id, progressHandle);
-            setProcessing(false);
+            utils.sse.removeEventListener(state.task_id, progressHandle);
+            setState((prev) => ({ ...prev, 'processing': false, percent: 0, task_id: null }));
         }
     };
-
     const setOutputDir = async (e) => {
         const result = await tauri.dialog.open({ directory: true });
         if (!result) return;
@@ -28,18 +38,17 @@ export default function ({ list }) {
     };
 
     const startHandle = async () => {
-        sse.check();
+        utils.sse.check();
         const values = await form.validate();
-        setProcessing(true);
-        setPercent(0);
+        setState({ ...state, 'processing': true, percent: 0 });
         values['videos'] = list;
-        const { task_id } = await service.removeAudio(values);
-        setCurrentTaskId(task_id);
-        sse.addEventListener(task_id, progressHandle);
-        sse.addEventListener(consts.events.error, () => setProcessing(false));
+        const { task_id } = await utils.ext.invoke('audio.remove', values);
+        setState({ ...state, 'task_id': task_id });
+        utils.sse.addEventListener(task_id, progressHandle);
+        utils.sse.addEventListener(consts.events.error, () => setState({ ...state, 'processing': false }));
     };
     return (
-        <ui.Form {...consts.config.formProps} form={form} initialValues={values} onValuesChange={setValues}>
+        <ui.Form {...consts.config.formProps} form={form} initialValues={state?.values} onValuesChange={(_, values) => setState((prev) => ({ ...prev, 'values': values }))}>
             <ui.Form.Item
                 rules={[{ required: true, message: '请设置输出格式' }]}
                 field='output_fmt'
@@ -55,13 +64,14 @@ export default function ({ list }) {
                 children={<ui.Input autoWidth={{ minWidth: '360px' }} />}
             />
 
+
             <ProgressBtn
                 onClick={startHandle}
                 size='small'
-                loading={processing}
-                progress={percent}
+                loading={state?.processing || false}
+                progress={state?.percent || 0}
                 disabled={list.length === 0}
-                children={processing ? '处理中' : '开始处理'}
+                children={state?.processing ? '处理中' : '开始处理'}
                 type='primary'
                 style={{ width: '100%' }}
             />

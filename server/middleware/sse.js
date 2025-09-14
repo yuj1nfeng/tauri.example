@@ -27,9 +27,9 @@ export default (c) => {
         await stream.writeSSE({ data: '欢迎连接到时间流', event: 'welcome' });
         await stream.sleep(1000);
         while (true) {
-            const message = `It is ${new Date().toISOString()}`;
-            await stream.writeSSE({ data: message, event: 'time-update' });
-            await stream.sleep(1000);
+            const message = `${new Date().toISOString()}`;
+            await stream.writeSSE({ data: message, event: 'heartbeat' });
+            await stream.sleep(5000);
         }
     });
 };
