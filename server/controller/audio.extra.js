@@ -14,6 +14,7 @@ export default async (ctx) => {
     let handled = 0;
     const progress_cb = async (progress) => await emitEvent(task_id, (((progress.current + handled) / total_duration) * 100).toFixed(2));
     await emitEvent(consts.events.info, `开始处理,共 ${videos.length} 个视频, 总时长 ${total_duration.toFixed(2)} 秒`);
+
     (async () => {
         try {
             for (const video of videos) {
@@ -29,8 +30,6 @@ export default async (ctx) => {
                 await ffmpeg.extraAudio(video.filename, output, { progress_cb: progress_cb });
                 handled += Number(video.duration);
             }
-
-            await emitEvent(consts.events.info, '处理完成');
         } catch (error) {
             await emitEvent(consts.events.error, error.message);
         } finally {

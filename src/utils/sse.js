@@ -17,7 +17,7 @@ function getEventSource() {
     source.addEventListener(consts.events.error, (event) => ui.Message.error(event.data));
     source.addEventListener(consts.events.warning, (event) => ui.Message.warning(event.data));
     source.addEventListener(consts.events.info, (event) => ui.Message.info(event.data));
-    source.addEventListener('heartbeat', (event) => console.log('heartbeat', event.data));
+    source.addEventListener(consts.events.heartbeat, (event) => console.log('heartbeat', event.data));
     return source;
 }
 

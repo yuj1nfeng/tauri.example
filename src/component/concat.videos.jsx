@@ -14,12 +14,7 @@ export default function ConcatVideos({ list }) {
     const [form] = ui.Form.useForm();
     const init = async () => {
         console.log(namespace + '\tinit');
-        sse.check();
         setState((prev) => ({ ...prev, 'processing': false, 'percent': 0 }));
-        const { task_id } = state;
-        console.log('task_id:', task_id);
-        if (!task_id) return;
-        sse.addEventListener(task_id, progressHandle);
         return () => {
             console.log('destory');
         };
@@ -33,10 +28,8 @@ export default function ConcatVideos({ list }) {
     const progressHandle = (data) => {
         const percent = Number(data);
         setState((prev) => ({ ...prev, 'percent': percent }));
-        if (parseInt(data) === 100) {
-            utils.sse.removeEventListener(state.task_id, progressHandle);
-            setState((prev) => ({ ...prev, 'processing': false, percent: 0, task_id: null }));
-        }
+        if (parseInt(data) === 100) setState((prev) => ({ ...prev, 'processing': false, percent: 0, task_id: null }));
+
     };
 
     const setOutputDir = async (e) => {
@@ -46,8 +39,6 @@ export default function ConcatVideos({ list }) {
     };
 
     const startHandle = async () => {
-
-        sse.check();
         const values = await form.validate();
         setState((prev) => ({ ...prev, 'processing': true, percent: 0 }));
         values['videos'] = list;
@@ -55,7 +46,7 @@ export default function ConcatVideos({ list }) {
         values['output_file'] = `${values.output_dir}/${file_name}`;
         const { task_id } = await utils.ext.invoke('video.concat', values);
         setState((prev) => ({ ...prev, 'task_id': task_id }));
-        sse.addEventListener(task_id, progressHandle);
+        utils.task.createTask(task_id, values, progressHandle);
         sse.addEventListener(consts.events.error, () => setState((prev) => ({ ...prev, 'processing': false, 'percent': 0 })));
     };
     return (

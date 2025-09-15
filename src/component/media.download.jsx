@@ -1,6 +1,7 @@
 import React from 'react';
 import * as ui from '@arco-design/web-react';
 import * as icon from '@arco-design/web-react/icon';
+import utils from '../utils/index.js';
 export default function () {
     const openModal = () => {
         ui.Modal.info({
@@ -19,8 +20,10 @@ export default function () {
         });
     };
 
-    const downloadMedia = () => {
-        alert('start download');
+    const downloadMedia = async () => {
+        // https://youtu.be/8_F5_AXtaxM
+        const result = await utils.ext.invoke('media.download', { url: 'https://youtu.be/8_F5_AXtaxM' });
+        console.log(result);
     };
 
     return <ui.Button size='mini' onClick={openModal} icon={<icon.IconCloudDownload />}></ui.Button>;

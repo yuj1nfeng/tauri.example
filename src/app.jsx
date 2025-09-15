@@ -9,14 +9,16 @@ import AutoCut from './component/auto.cut.jsx';
 import ExtraAudio from './component/extra.audio.jsx';
 import RemoveAudio from './component/remove.audio.jsx';
 import SplitVideos from './component/split.videos.jsx';
-import MediaDownload from './component/media.download.jsx';
+import DownloadVideo from './component/download.video.jsx';
 
 export default function () {
     const [list, setList] = React.useState([]);
-    React.useEffect(() => {
-        utils.sse.check();
-        (async () => setList(await utils.videoStore.getAll()))();
-    });
+
+    const init = async () => {
+        const list = await utils.videoStore.getAll();
+        setList(list);
+    };
+    React.useEffect(() => init, []);
 
     const addList = async (file_list) => {
         const exists_list = list.map((p) => p.filename);
@@ -32,7 +34,8 @@ export default function () {
         }
     };
     const uploadFiles = async () => {
-        const file_list = await tauri.dialog.open({ filters: [{ name: 'videos', extensions: ['mp4', 'mov'] }], multiple: true });
+        const file_list = await tauri.dialog.open({ filters: [{ name: 'videos', extensions: ['mp4', 'mov', 'webm'] }], multiple: true });
+        if (file_list.length === 0) return;
         await addList(file_list);
     };
     const uploadFolder = async () => {
@@ -60,7 +63,7 @@ export default function () {
             <ui.List.Item.Meta
                 avatar={
                     <ui.Avatar triggerIcon={<icon.IconPlayArrow onClick={() => utils.ext.invoke('video.play', { input: item.filename })} />} shape='square'>
-                        <ui.Image src={item.thumbnail} />
+                        <ui.Image width={40} height={40} src={item.thumbnail} />
                     </ui.Avatar>
                 }
                 title={item.title}
@@ -77,8 +80,6 @@ export default function () {
             <main className='main'>
                 <ui.Space size='mini' style={{ marginBottom: '1em', display: 'flex', justifyContent: 'space-between' }}>
                     <ui.Button size='mini' onClick={uploadFiles} icon={<icon.IconUpload />}></ui.Button>
-                    <MediaDownload />
-                    <MediaDownload />
                     <ui.Button size='mini' onClick={uploadFolder} icon={<icon.IconFolderAdd />}></ui.Button>
                     <ui.Button size='mini' onClick={clearFiles} icon={<icon.IconDelete />}></ui.Button>
                 </ui.Space>
@@ -90,6 +91,7 @@ export default function () {
                     <ui.Tabs.TabPane key='4' title='音频提取' children={<ExtraAudio list={list} />} />
                     <ui.Tabs.TabPane key='5' title='音频去除' children={<RemoveAudio list={list} />} />
                     <ui.Tabs.TabPane key='6' title='自动混剪' children={<AutoCut list={list} />} />
+                    <ui.Tabs.TabPane key='7' title='下载视频' children={<DownloadVideo list={list} />} />
                 </ui.Tabs>
             </main>
             <footer style={{ position: 'absolute', bottom: 0, left: 0, zIndex: 1, cursor: 'pointer', color: '#3e3e3e', fontSize: '8px' }}>

@@ -32,7 +32,7 @@ export default function ConcatVideos({ list }) {
         const values = await form.validate();
         setState((prev) => ({ ...prev, processing: true, percent: 0 }));
         values['videos'] = list;
-        const { task_id } = await utils.ext.invoke('video.split', values);
+        const { task_id } = await utils.ext.invoke('video.download', values);
         setState((prev) => ({ ...prev, task_id: task_id }));
         utils.task.createTask(task_id, values, progressHandle);
         utils.sse.addEventListener(consts.events.error, () => setState((prev) => ({ ...prev, 'processing': false, 'percent': 0 })));
@@ -40,10 +40,10 @@ export default function ConcatVideos({ list }) {
     return (
         <ui.Form {...consts.config.formProps} form={form} initialValues={state?.values} onValuesChange={(_, values) => setState((prev) => ({ ...prev, values: values }))}>
             <ui.Form.Item
-                field='split_duration'
-                rules={[{ required: true, message: '请设置输出目录' }]}
+                field='url'
+                rules={[{ required: true, message: '请设置视频链接' }]}
                 label='切片时长'
-                children={<ui.Slider placeholder='请选择切片时长' step={5} min={5} max={150} defaultValue={60} formatTooltip={(number) => `${number} 秒`} style={{ width: '240px' }} />}
+                children={<ui.Input placeholder='请设置视频链接' style={{ width: '380px' }} />}
             />
 
             <ui.Form.Item
