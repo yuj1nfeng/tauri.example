@@ -1,16 +1,18 @@
+import path from 'node:path';
+import fs from 'node:fs/promises';
+import os from 'node:os';
+import { exec } from 'node:child_process';
+
 // 导出模块函数
-export default { downloadVideo, resolveUrl };
+export default { downloadVideo, resolveUrl, findChromeUserData };
 
 /**
  * 从yt-dlp输出中解析下载进度
  * @param {string} output - yt-dlp的输出文本
  * @returns {number|null} - 解析出的进度百分比，解析失败则返回null
  */
-function parseYtDlpProgress(output) {
+function parseYtDlpProgress(text) {
     try {
-        // 将Buffer转换为字符串
-        const text = new TextDecoder().decode(output);
-        console.log(text);
         // 匹配下载进度百分比
         // 示例: [download]  23.5% of ~50.00MiB at  3.00MiB/s ETA 00:15
         const percentMatch = text.match(/\[download\]\s+(\d+\.\d+)%/);
@@ -42,19 +44,18 @@ function parseYtDlpProgress(output) {
 /**
  * 下载视频
  * @param {string} url - 要下载的视频URL
- * @param {string} output_file - 输出文件路径
+ * @param {string} output_dir - 输出文件路径
  * @param {Function} progress_cb - 进度回调函数
  * @returns {Promise<void>}
  */
-async function downloadVideo(url, output_file, progress_cb) {
+async function downloadVideo(url, output_dir, progress_cb) {
     if (!url) throw new Error('URL不能为空');
-    if (!output_file) throw new Error('输出文件路径不能为空');
     // 构建命令
     const cmds = ['yt-dlp'];
-    cmds.push('-o', output_file);
-    // cmds.push('-S', 'res:max,fps:max');
-    cmds.push('-S', 'res:max');
-    cmds.push('--cookies-from-browser', 'chrome');
+    cmds.push('-o', '%(extractor)s/%(title)s.%(ext)s');
+    cmds.push('-S', 'res:max,fps:max');
+    // cmds.push('-S', 'res:max');
+    cmds.push('--cookies-from-browser', `firefox`);
     // 添加进度输出参数
     cmds.push('--newline'); // 确保每个进度更新都在新行
     cmds.push('--progress');
@@ -63,18 +64,23 @@ async function downloadVideo(url, output_file, progress_cb) {
     console.log(`执行命令: ${cmds.join(' ')}`);
 
     // 启动进程
-    const proc = Bun.spawn(cmds, { stdout: 'pipe', stderr: 'pipe' });
+    const proc = Bun.spawn(cmds, { stdout: 'pipe', stderr: 'pipe', cwd: output_dir });
     // 处理进度输出
     if (progress_cb != null) {
         let last_progress = 0;
+        let stage = 0;;
         await proc.stdout.pipeTo(
             new WritableStream({
                 write: (chunk) => {
-                    const progress = parseYtDlpProgress(chunk);
-                    // 只有当进度有变化且有效时才回调
-                    if (progress !== null && progress !== last_progress) {
-                        last_progress = progress;
-                        progress_cb(progress);
+                    const text = new TextDecoder().decode(chunk);
+                    console.log(text);
+                    const match = text.match(/\[download\]\sDestination:*/);
+                    if (match && match[0]) stage += 1;
+                    const progress = parseYtDlpProgress(text);
+                    if (progress !== null) {
+                        last_progress = stage == 1 ? progress / 2 : (progress / 2) + 50;
+                        progress_cb(last_progress);
+                        console.log(`进度: ${last_progress.toFixed(2)}%`);
                     }
                 },
             }),
@@ -121,4 +127,81 @@ async function resolveUrl(url) {
         })
         .filter(Boolean);
     return formats;
+}
+
+async function findChromeUserData() {
+    function getDefaultUserDataPaths() {
+        const home = os.homedir();
+        const paths = [];
+        switch (os.platform()) {
+            case 'win32':
+                paths.push(
+                    path.join(home, 'AppData', 'Local', 'Google', 'Chrome', 'User Data'),
+                    path.join(home, 'AppData', 'Local', 'Google', 'Chrome SxS', 'User Data'),
+                    path.join(home, 'AppData', 'Local', 'Google', 'Chrome Beta', 'User Data'),
+                );
+                break;
+            case 'darwin':
+                paths.push(
+                    path.join(home, 'Library', 'Application Support', 'Google', 'Chrome', 'Default'),
+                    path.join(home, 'Library', 'Application Support', 'Google', 'Chrome Canary', 'Default')
+                );
+                break;
+            case 'linux':
+                paths.push(
+                    path.join(home, '.config', 'google-chrome', 'Default'),
+                    path.join(home, '.config', 'google-chrome-beta', 'Default'),
+                    path.join(home, '.config', 'google-chrome-unstable', 'Default')
+                );
+                break;
+        }
+        return paths;
+    }
+    async function checkPathExists(path) {
+        try {
+            await fs.access(path);
+            return true;
+        } catch {
+            return false;
+        }
+    }
+    async function findFromRegistry() {
+        if (os.platform() !== 'win32') return null;
+        const regPaths = [
+            'HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\App Paths\\chrome.exe',
+            'HKLM\\Software\\Wow6432Node\\Microsoft\\Windows\\CurrentVersion\\App Paths\\chrome.exe'
+        ];
+
+        for (const regPath of regPaths) {
+            try {
+                const result = await new Promise((resolve, reject) => {
+                    exec(`reg query "${regPath}" /ve`, (err, stdout) => {
+                        if (err) return reject(err);
+                        resolve(stdout);
+                    });
+                });
+
+                const match = result.match(/REG_SZ\s+(.*\\chrome\.exe)/i);
+                if (match && match[1]) {
+                    const installPath = path.dirname(match[1]);
+                    const userDataPath = path.resolve(installPath, '..', 'User Data');
+                    if (existsSync(userDataPath)) {
+                        return userDataPath;
+                    }
+                }
+            } catch {
+                continue;
+            }
+        }
+
+        return null;
+    }
+    // 检查默认路径
+    const default_paths = getDefaultUserDataPaths();
+    for (const path of default_paths) if (await checkPathExists(path)) return path;
+    // Windows系统尝试从注册表查找
+    if (os.platform() === 'win32') if (await findFromRegistry()) return path;
+    // 未找到
+    return null;
+
 }

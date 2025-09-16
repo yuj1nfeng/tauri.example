@@ -1,3 +1,4 @@
+
 export default {
     video_output_fmt: [
         { label: 'mp4', value: 'mp4' },
@@ -32,5 +33,17 @@ export default {
         { label: '右上', value: 'right-top' },
         { label: '左下', value: 'left-bottom' },
         { label: '右下', value: 'right-bottom' },
+    ],
+
+    browser: [
+        { label: 'Edge', value: 'edge' },
+        { label: 'Firefox', value: 'firefox' },
+        { label: 'Chrome', value: 'chrome' },
+        { label: 'Chromium', value: 'chromium' },
+        { label: 'Opera', value: 'opera' },
+        { label: 'Safari', value: 'safari' },
+        { label: 'Vivaldi', value: 'vivaldi' },
+        { label: 'Brave', value: 'brave' },
+        { label: 'Whale', value: 'whale' },
     ],
 };

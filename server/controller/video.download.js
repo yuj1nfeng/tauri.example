@@ -10,11 +10,10 @@ export default async (ctx) => {
     const { url, output_dir } = body;
     const task_id = dayjs().format('YYYYMMDDHHmmss') + Math.floor(Math.random() * 1000);
     ctx.set('task_id', task_id);
-    const output_file = path.join(output_dir, `${task_id}.mp4`);
     const progress_cb = async (progress) => await emitEvent(task_id, progress.toFixed(2));
     (async () => {
         try {
-            await utils.ytdlp.downloadVideo(url, output_file, progress_cb);
+            await utils.ytdlp.downloadVideo(url, output_dir, progress_cb);
         } catch (error) {
             await emitEvent(consts.events.error, error.message);
         } finally {

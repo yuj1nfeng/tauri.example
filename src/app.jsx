@@ -1,15 +1,14 @@
 import React from 'react';
 import * as ui from '@arco-design/web-react';
 import * as icon from '@arco-design/web-react/icon';
-import yaml from 'yaml';
 import utils, { tauri, consts } from './utils/index.js';
-import ConcatVideos from './component/concat.videos.jsx';
-import AddWatermark from './component/add.watermark.jsx';
-import AutoCut from './component/auto.cut.jsx';
-import ExtraAudio from './component/extra.audio.jsx';
-import RemoveAudio from './component/remove.audio.jsx';
-import SplitVideos from './component/split.videos.jsx';
-import DownloadVideo from './component/download.video.jsx';
+import VideoConcat from './component/video.concat.jsx';
+import VideoAddWatermark from './component/video.add.watermark.jsx';
+import VideoAutoCut from './component/video.auto.cut.jsx';
+import AudioExtra from './component/audio.extra.jsx';
+import AudioRemove from './component/audio.remove.jsx';
+import VideoSplit from './component/video.split.jsx';
+import VideoDownload from './component/video.download.jsx';
 
 export default function () {
     const [list, setList] = React.useState([]);
@@ -85,13 +84,13 @@ export default function () {
                 </ui.Space>
                 <ui.List size='small' style={{ height: '34vh', padding: '0 20px' }} dataSource={list} render={renderItem} />
                 <ui.Tabs defaultActiveTab='1'>
-                    <ui.Tabs.TabPane key='1' title='视频切片' children={<SplitVideos list={list} />} />
-                    <ui.Tabs.TabPane key='2' title='添加水印' children={<AddWatermark list={list} />} />
-                    <ui.Tabs.TabPane key='3' title='视频拼接' children={<ConcatVideos list={list} />} />
-                    <ui.Tabs.TabPane key='4' title='音频提取' children={<ExtraAudio list={list} />} />
-                    <ui.Tabs.TabPane key='5' title='音频去除' children={<RemoveAudio list={list} />} />
-                    <ui.Tabs.TabPane key='6' title='自动混剪' children={<AutoCut list={list} />} />
-                    <ui.Tabs.TabPane key='7' title='下载视频' children={<DownloadVideo list={list} />} />
+                    <ui.Tabs.TabPane key='1' title='视频切片' children={<VideoSplit list={list} />} />
+                    <ui.Tabs.TabPane key='2' title='添加水印' children={<VideoAddWatermark list={list} />} />
+                    <ui.Tabs.TabPane key='3' title='视频拼接' children={<VideoConcat list={list} />} />
+                    <ui.Tabs.TabPane key='4' title='音频提取' children={<AudioExtra list={list} />} />
+                    <ui.Tabs.TabPane key='5' title='音频去除' children={<AudioRemove list={list} />} />
+                    <ui.Tabs.TabPane key='6' title='自动混剪' children={<VideoAutoCut list={list} />} />
+                    <ui.Tabs.TabPane key='7' title='下载视频' children={<VideoDownload list={list} />} />
                 </ui.Tabs>
             </main>
             <footer style={{ position: 'absolute', bottom: 0, left: 0, zIndex: 1, cursor: 'pointer', color: '#3e3e3e', fontSize: '8px' }}>

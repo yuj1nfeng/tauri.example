@@ -47,6 +47,12 @@ export default function ConcatVideos({ list }) {
             />
 
             <ui.Form.Item
+                field='browser'
+                rules={[{ required: true, message: '请设置cookie来源' }]}
+                label='cookie源'
+                children={<ui.Select options={consts.options.browser} autoWidth={{ minWidth: '380px' }} />}
+            />
+            <ui.Form.Item
                 field='output_dir'
                 rules={[{ required: true, message: '请设置输出目录' }]}
                 label='输出目录'
@@ -57,7 +63,7 @@ export default function ConcatVideos({ list }) {
                 size='small'
                 loading={state?.processing || false}
                 progress={state?.percent || 0}
-                disabled={list.length === 0}
+                disabled={state?.processing || false}
                 children={state?.processing ? '处理中' : '开始处理'}
                 type='primary'
                 style={{ width: '100%' }}
