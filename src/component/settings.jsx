@@ -30,10 +30,14 @@ export default () => {
                 visible={visible}
                 onCancel={closeModal}
                 onConfirm={closeModal}
-                closeBtn={false}
+                closeBtn={true}
                 onClose={closeModal}
-                confirmBtn={<ui.Button onClick={closeModal}>保存</ui.Button>}
-                style={{ padding: '10px 22px' }}
+                cancelBtn={false}
+                confirmBtn={false}
+
+                footer={<ui.Button size='small' style={{ width: '100%' }} onClick={closeModal}>保存</ui.Button>}
+                style={{ padding: '10px 22px 28px 22px' }}
+                destroyOnClose={true}
             >
 
                 <ui.Form labelAlign="left" labelWidth={80} colon >
