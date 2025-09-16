@@ -1,4 +1,4 @@
-import * as ui from '@arco-design/web-react';
+import * as ui from 'tdesign-react';
 import consts from '#consts';
 
 const url = 'http://localhost:3000/sse';
@@ -14,9 +14,9 @@ function getEventSource() {
         return source;
     }
     source = new EventSource(url);
-    source.addEventListener(consts.events.error, (event) => ui.Message.error(event.data));
-    source.addEventListener(consts.events.warning, (event) => ui.Message.warning(event.data));
-    source.addEventListener(consts.events.info, (event) => ui.Message.info(event.data));
+    source.addEventListener(consts.events.error, (event) => ui.MessagePlugin.error(event.data));
+    source.addEventListener(consts.events.warning, (event) => ui.MessagePlugin.warning(event.data));
+    source.addEventListener(consts.events.info, (event) => ui.MessagePlugin.info(event.data));
     source.addEventListener(consts.events.heartbeat, (event) => console.log('heartbeat', event.data));
     return source;
 }

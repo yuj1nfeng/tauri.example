@@ -9,6 +9,7 @@ import AudioExtra from './component/audio.extra.jsx';
 import AudioRemove from './component/audio.remove.jsx';
 import VideoSplit from './component/video.split.jsx';
 import VideoDownload from './component/video.download.jsx';
+import Settings from './component/settings.jsx';
 
 export default function () {
     const [list, setList] = React.useState([]);
@@ -85,10 +86,21 @@ export default function () {
             </header>
 
             <main className='main'>
+
+                {/* <ui.StickyTool
+                    style={{ position: 'absolute', top: '0', left: '0', height: "100", width: '200' }}
+                    offset={[-50, -24]}
+                    type='compact'
+                >
+                    <ui.StickyTool.StickyItem label="chat" icon={<icon.ChatIcon />}></ui.StickyTool.StickyItem>
+                    <ui.StickyTool.StickyItem label="add" icon={<icon.AddIcon />}></ui.StickyTool.StickyItem>
+
+                </ui.StickyTool> */}
                 <ui.Space size='mini' style={{ marginBottom: '2px', display: 'flex', justifyContent: 'space-between' }}>
                     <ui.Button size='small' variant="text" shape="square" onClick={uploadFiles} icon={<icon.FileAddFilledIcon />}></ui.Button>
                     <ui.Button size='small' variant="text" shape="square" onClick={uploadFolder} icon={<icon.FolderAddFilledIcon />}></ui.Button>
                     <ui.Button size='small' variant="text" shape="square" onClick={clearFiles} icon={<icon.DeleteFilledIcon />}></ui.Button>
+                    <Settings />
                 </ui.Space>
                 <ui.List size='small' style={{ height: '34vh', padding: '0 10px', border: '1px solid #c6c6c6', borderRadius: '8px' }} >
                     {renderItems()}
