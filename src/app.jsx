@@ -1,7 +1,7 @@
 import { RecoilRoot } from 'recoil';
-import VideoList from './component/video.list.jsx';
-import Tools from './component/tools.jsx';
-import Actions from './component/actions.jsx';
+import VideoList from '@/component/video.list.jsx';
+import Tools from '@/component/tools.jsx';
+import Actions from '@/component/actions.jsx';
 export default function () {
     return (
         <RecoilRoot >

@@ -1,8 +1,8 @@
 import React from 'react';
-import utils, { tauri, consts, rules, sse } from '../../utils/index.js';
+import utils, { tauri, consts, rules, sse } from '@/utils/index.js';
 import * as ui from 'tdesign-react';
 import * as icon from 'tdesign-icons-react';
-import ProgressBtn from '../progress.btn.jsx';
+import ProgressBtn from '@/component/progress.btn.jsx';
 const namespace = new URL(import.meta.url).pathname;
 export default function ConcatVideos() {
     const [state, setState] = React.useState(utils.kv.withNamespace(namespace).get('state'));

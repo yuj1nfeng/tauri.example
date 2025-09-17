@@ -1,11 +1,11 @@
 import * as ui from 'tdesign-react';
-import VideoSplit from './tool/video.split.jsx';
-import VideoConcat from './tool/video.concat.jsx';
-import VideoAddWatermark from './tool/video.add.watermark.jsx';
-import VideoAutoCut from './tool/video.auto.cut.jsx';
-import AudioExtra from './tool/audio.extra.jsx';
-import AudioRemove from './tool/audio.remove.jsx';
-import VideoDownload from './tool/video.download.jsx';
+import VideoSplit from './tool/video.split';
+import VideoConcat from './tool/video.concat';
+import VideoAddWatermark from './tool/video.add.watermark';
+import VideoAutoCut from './tool/video.auto.cut';
+import AudioExtra from './tool/audio.extra';
+import AudioRemove from './tool/audio.remove';
+import VideoDownload from './tool/video.download';
 
 
 

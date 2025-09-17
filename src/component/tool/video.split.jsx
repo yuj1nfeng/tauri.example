@@ -2,9 +2,9 @@ import React from 'react';
 import * as ui from 'tdesign-react';
 import * as icon from 'tdesign-icons-react';
 import { useRecoilValue } from 'recoil';
-import videosSelector from '../../store/videos.selector.js';
-import utils, { tauri, consts, rules } from '../../utils/index.js';
-import ProgressBtn from '../progress.btn.jsx';
+import videosSelector from '@/store/videos.selector.js';
+import utils, { tauri, consts, rules } from '@/utils/index.js';
+import ProgressBtn from '@/component/progress.btn.jsx';
 
 const namespace = new URL(import.meta.url).pathname;
 export default function ConcatVideos() {

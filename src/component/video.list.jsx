@@ -1,11 +1,11 @@
 
 import React from 'react';
 import { useRecoilState } from 'recoil';
-import videosStore from '../store/videos.atom.js';
+import videosStore from '@/store/videos.atom.js';
 import * as ui from 'tdesign-react';
 import * as icon from 'tdesign-icons-react';
-import utils from '../utils/index.js';
-import useVideoService from '../service/video.service.js';
+import utils from '@/utils/index.js';
+import useVideoService from '@/service/video.service.js';
 
 
 export default function VideoList() {
