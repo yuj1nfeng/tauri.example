@@ -26,6 +26,10 @@ const videoAutoCutRules = {
     output_fmt: [{ required: true, message: '请设置输出格式' }],
     scale_width: [{ required: true, message: '请设置画面宽度' }],
     scale_height: [{ required: true, message: '请设置画面高度' }],
+    min_duration: [{ required: true, message: '请设置最小时长' }],
+    max_duration: [{ required: true, message: '请设置最大时长' }],
+    audio_channels: [{ required: true, message: '请设置音频通道数' }],
+    audio_bit_rate: [{ required: true, message: '请设置音频码率' }],
 };
 
 const videoConcatRules = {

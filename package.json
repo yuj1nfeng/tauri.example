@@ -6,7 +6,8 @@
     "imports": {
         "#ffmpeg": "yujf-ffmpeg",
         "#hono.ext": "yujf-hono.ext",
-        "#consts": "./consts/index.js"
+        "#consts": "./consts/index.js",
+        "#db": "./server/db/index.js"
     },
     "scripts": {
         "dev": "vite",
@@ -33,6 +34,7 @@
         "prop-types": "^15.8.1",
         "react": "^18.3.1",
         "react-dom": "^18.3.1",
+        "recoil": "^0.7.7",
         "tailwind-merge": "^3.3.1",
         "tailwindcss": "^4.1.13",
         "tdesign-react": "^1.15.1",

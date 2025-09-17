@@ -1,10 +1,10 @@
 import React from 'react';
-import utils, { tauri, consts, rules, sse } from '../utils/index.js';
+import utils, { tauri, consts, rules, sse } from '../../utils/index.js';
 import * as ui from 'tdesign-react';
 import * as icon from 'tdesign-icons-react';
-import ProgressBtn from './progress.btn.jsx';
+import ProgressBtn from '../progress.btn.jsx';
 const namespace = new URL(import.meta.url).pathname;
-export default function ConcatVideos({ list }) {
+export default function ConcatVideos() {
     const [state, setState] = React.useState(utils.kv.withNamespace(namespace).get('state'));
     const [form] = ui.Form.useForm();
     const init = async () => {
@@ -38,7 +38,7 @@ export default function ConcatVideos({ list }) {
         }
         const values = form.getFieldsValue(Object.keys(rules.videoDownloadRules));
         setState((prev) => ({ ...prev, processing: true, percent: 0 }));
-        values['videos'] = list;
+        values['videos'] = await utils.videoStore.getAll();
         const { task_id } = await utils.ext.invoke('video.download', values);
         setState((prev) => ({ ...prev, task_id: task_id }));
         utils.task.createTask(task_id, values, progressHandle);
@@ -55,15 +55,15 @@ export default function ConcatVideos({ list }) {
             labelWidth={80}
             onValuesChange={(_, values) => setState((prev) => ({ ...prev, values: values }))
             }>
-            <ui.Form.FormItem name='browser' label='cookie源'
+            <ui.Form.FormItem name='browser' label='浏览器'
                 children={<ui.Select size='small' options={consts.options.browser} style={{ width: '100px' }} />}
             />
             <ui.Form.FormItem name='output_dir' label='输出目录'
                 children={<ui.Input
                     size='small'
                     placeholder='请选择输出目录'
-                    style={{ width: '380px' }}
-                    suffixIcon={<icon.FolderSettingIcon cursor='pointer' onClick={setOutputDir} />}
+                    style={{ width: '364px' }}
+                    prefixIcon={<icon.FolderSettingIcon cursor='pointer' onClick={setOutputDir} />}
                 />}
             />
             <ui.Form.FormItem name='url' label='视频链接'

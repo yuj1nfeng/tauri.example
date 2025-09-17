@@ -12,7 +12,6 @@ export default async (ctx) => {
     ctx.set('task_id', task_id);
     const output_dir = path.dirname(output_file);
     if (!(await fs.exists(output_dir))) await fs.mkdir(output_dir, { recursive: true, force: true });
-
     const progress_cb = async (progress) => await emitEvent(task_id, ((progress.current / progress.total) * 100).toFixed(2));
     const inputs = videos.map((p) => p.filename);
     await emitEvent(consts.events.info, '开始处理');

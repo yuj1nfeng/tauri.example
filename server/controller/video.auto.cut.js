@@ -9,7 +9,7 @@ import path from 'node:path';
 
 export default async (ctx) => {
     const body = await ctx.req.json();
-    const { videos, output_file, split_duration, output_fmt, crf, preset, video_codec, video_bit_rate, audio_codec, audio_bit_rate, audio_channels, audio_sample_rate } = body;
+    const { videos, output_file, min_duration, max_duration, output_fmt, crf, preset, video_codec, video_bit_rate, audio_codec, audio_bit_rate, audio_channels, audio_sample_rate } = body;
     const task_id = dayjs().format('YYYYMMDDHHmmss') + Math.floor(Math.random() * 1000);
     ctx.set('task_id', task_id);
     let total_duration = videos.map((p) => Number(p.duration)).reduce((a, b) => a + b, 0);
@@ -26,7 +26,7 @@ export default async (ctx) => {
             const shotname = path.basename(video.filename);
             const duration = parseInt(video.duration || 0);
             const ext = path.extname(shotname);
-            let [min, max] = split_duration;
+            let [min, max] = [min_duration, max_duration];
             max = max > duration ? duration : max;
             if (!video.video) {
                 handled_duration += duration;
@@ -50,7 +50,7 @@ export default async (ctx) => {
         await fs.mkdir(fmt_output_dir, { recursive: true });
         const concat_inputs = [];
         for (const input of cliped_videos) {
-            const output = path.join(fmt_output_dir, `${ path.basename(input)}.${output_fmt}`);
+            const output = path.join(fmt_output_dir, `${path.basename(input)}.${output_fmt}`);
             await ffmpeg.convertVideoFmt(input, output, { codec: video_codec, crf: crf, preset: preset, progress_cb: progress_cb });
             handled_duration += await ffmpeg.getVideoDuration(input);
             concat_inputs.push(output);

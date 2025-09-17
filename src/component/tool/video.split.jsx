@@ -1,10 +1,14 @@
 import React from 'react';
-import utils, { tauri, consts, rules, sse } from '../utils/index.js';
 import * as ui from 'tdesign-react';
 import * as icon from 'tdesign-icons-react';
-import ProgressBtn from './progress.btn.jsx';
+import { useRecoilValue } from 'recoil';
+import videosSelector from '../../store/videos.selector.js';
+import utils, { tauri, consts, rules } from '../../utils/index.js';
+import ProgressBtn from '../progress.btn.jsx';
+
 const namespace = new URL(import.meta.url).pathname;
-export default function ConcatVideos({ list }) {
+export default function ConcatVideos() {
+    const videos = useRecoilValue(videosSelector);
     const [state, setState] = React.useState(utils.kv.withNamespace(namespace).get('state'));
     const [form] = ui.Form.useForm();
     const init = async () => {
@@ -39,7 +43,7 @@ export default function ConcatVideos({ list }) {
         }
         const values = form.getFieldsValue(Object.keys(rules.videoSplitRules));
         setState((prev) => ({ ...prev, processing: true, percent: 0 }));
-        values['videos'] = list;
+        values['videos'] = videos;
         const { task_id } = await utils.ext.invoke('video.split', values);
         setState((prev) => ({ ...prev, task_id: task_id }));
         utils.task.createTask(task_id, values, progressHandle);
@@ -66,7 +70,7 @@ export default function ConcatVideos({ list }) {
                     size='small'
                     placeholder='请选择输出目录'
                     style={{ width: '364px' }}
-                    suffixIcon={<icon.FolderSettingIcon cursor='pointer' onClick={setOutputDir} />}
+                    prefixIcon={<icon.FolderSettingIcon cursor='pointer' onClick={setOutputDir} />}
                 />}
             />
             <ProgressBtn
@@ -74,7 +78,7 @@ export default function ConcatVideos({ list }) {
                 size='small'
                 loading={state?.processing || false}
                 progress={state?.percent || 0}
-                disabled={list.length === 0}
+                disabled={videos.length === 0}
                 children={state?.processing ? '处理中' : '开始处理'}
                 type='primary'
                 style={{ width: '100%' }}

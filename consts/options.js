@@ -1,31 +1,31 @@
 
 export default {
     video_output_fmt: [
-        { label: 'mp4', value: 'mp4' },
-        { label: 'mkv', value: 'mkv' },
-        { label: 'avi', value: 'avi' },
-        { label: 'mov', value: 'mov' },
-        { label: 'wmv', value: 'wmv' },
-        { label: 'flv', value: 'flv' },
+        { label: 'MP4', value: 'mp4' },
+        { label: 'MKV', value: 'mkv' },
+        { label: 'AVI', value: 'avi' },
+        { label: 'MOV', value: 'mov' },
+        { label: 'WMV', value: 'wmv' },
+        { label: 'FLV', value: 'flv' },
     ],
 
     audio_output_fmt: [
-        { label: 'mp3', value: 'mp3' },
-        { label: 'wav', value: 'wav' },
-        { label: 'aac', value: 'aac' },
-        { label: 'flac', value: 'flac' },
+        { label: 'MP3', value: 'mp3' },
+        { label: 'WAV', value: 'wav' },
+        { label: 'AAC', value: 'aac' },
+        { label: 'FLAC', value: 'flac' },
     ],
 
     video_codec: [
-        { label: 'h264', value: 'h264' },
-        { label: 'h265', value: 'h265' },
-        { label: 'vp8', value: 'vp8' },
-        { label: 'vp9', value: 'vp9' },
+        { label: 'H264', value: 'h264' },
+        { label: 'H265', value: 'h265' },
+        { label: 'VP8', value: 'vp8' },
+        { label: 'CP9', value: 'vp9' },
     ],
 
     audio_codec: [
-        { label: 'aac', value: 'aac' },
-        { label: 'mp3', value: 'mp3' },
+        { label: 'AAC', value: 'aac' },
+        { label: 'MP3', value: 'mp3' },
     ],
 
     watermark_position: [

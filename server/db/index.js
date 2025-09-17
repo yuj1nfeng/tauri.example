@@ -36,3 +36,5 @@ export const VideoThumbnail = sequelize.define('video_thumbnail', {
     created_at: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
     updated_at: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
 });
+
+await sequelize.sync({ force: true });
