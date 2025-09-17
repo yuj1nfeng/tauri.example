@@ -1,6 +1,7 @@
 import React from 'react';
-import utils, { tauri, consts, sse } from '../utils/index.js';
-import * as ui from '@arco-design/web-react';
+import utils, { tauri, consts, rules, sse } from '../utils/index.js';
+import * as ui from 'tdesign-react';
+import * as icon from 'tdesign-icons-react';
 import ProgressBtn from './progress.btn.jsx';
 const namespace = new URL(import.meta.url).pathname;
 export default function ConcatVideos({ list }) {
@@ -9,6 +10,8 @@ export default function ConcatVideos({ list }) {
     const init = async () => {
         console.log(namespace + '\tinit');
         setState((prev) => ({ ...prev, processing: false, percent: 0 }));
+
+        if (state?.task_id) utils.sse.addEventListener(state.task_id, progressHandle);
         return () => {
             console.log('destory');
         };
@@ -18,18 +21,23 @@ export default function ConcatVideos({ list }) {
 
     const progressHandle = (data) => {
         const percent = Number(data);
-        setState((prev) => ({ ...prev, percent: percent }));
+        setState((prev) => ({ ...prev, percent: percent, processing: true }));
         if (parseInt(data) === 100) setState((prev) => ({ ...prev, processing: false, percent: 0, task_id: null }));
 
     };
     const setOutputDir = async (e) => {
         const result = await tauri.dialog.open({ directory: true });
         if (!result) return;
-        form.setFieldValue('output_dir', result.replace(/\\/g, '/'));
+        form.setFieldsValue({ 'output_dir': result.replace(/\\/g, '/') });
     };
 
     const startHandle = async () => {
-        const values = await form.validate();
+        const result = await form.validate();
+        if (result != true) {
+            ui.MessagePlugin.error(result[Object.keys(result)[0]][0].message);
+            return;
+        }
+        const values = form.getFieldsValue(Object.keys(rules.videoSplitRules));
         setState((prev) => ({ ...prev, processing: true, percent: 0 }));
         values['videos'] = list;
         const { task_id } = await utils.ext.invoke('video.split', values);
@@ -38,19 +46,33 @@ export default function ConcatVideos({ list }) {
         utils.sse.addEventListener(consts.events.error, () => setState((prev) => ({ ...prev, 'processing': false, 'percent': 0 })));
     };
     return (
-        <ui.Form {...consts.config.formProps} form={form} initialValues={state?.values} onValuesChange={(_, values) => setState((prev) => ({ ...prev, values: values }))}>
-            <ui.Form.Item
-                field='split_duration'
-                rules={[{ required: true, message: '请设置输出目录' }]}
+        <ui.Form
+            layout='inline'
+            form={form}
+            colon={true}
+            rules={rules.videoSplitRules}
+            showErrorMessage={false}
+            initialData={state?.values}
+            style={{ paddingTop: '10px' }}
+            labelWidth={80}
+            onValuesChange={(_, values) => setState((prev) => ({ ...prev, values: values }))
+            }>
+            <ui.Form.FormItem
+                name='split_duration'
+
                 label='切片时长'
-                children={<ui.Slider placeholder='请选择切片时长' step={5} min={5} max={150} defaultValue={60} formatTooltip={(number) => `${number} 秒`} style={{ width: '240px' }} />}
+                children={<ui.Slider size='small' style={{ width: '240px' }} />}
             />
 
-            <ui.Form.Item
-                field='output_dir'
-                rules={[{ required: true, message: '请设置输出目录' }]}
+            <ui.Form.FormItem
+                name='output_dir'
                 label='输出目录'
-                children={<ui.Input onClick={setOutputDir} placeholder='请选择输出目录' defaultValue='~/Videos' style={{ width: '380px' }} />}
+                children={<ui.Input
+                    size='small'
+                    placeholder='请选择输出目录'
+                    style={{ width: '364px' }}
+                    suffixIcon={<icon.FolderSettingIcon cursor='pointer' onClick={setOutputDir} />}
+                />}
             />
             <ProgressBtn
                 onClick={startHandle}

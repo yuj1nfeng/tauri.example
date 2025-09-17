@@ -65,7 +65,7 @@ export default function () {
                             fit='contain'
                             shape='square'
                             src={item.thumbnail}
-                            style={{ height: '48px', width: 'auto', cursor: 'pointer', borderRadius: '4px' }}
+                            style={{ height: '48px', width: '48px', cursor: 'pointer', borderRadius: '4px' }}
                             overlayTrigger='hover'
                             overlayContent={<icon.PlayCircleIcon color='red' onClick={() => utils.ext.invoke('video.play', { input: item.filename })} />}
                         />
@@ -73,8 +73,8 @@ export default function () {
                     </ui.Space>
                 }>
                 <ui.List.ListItemMeta
-                    description={<text style={{ fontSize: '12px', fontFamily: 'consolas', textOverflow: 'hidden' }}>{item.title}</text>}
-                    title={<text style={{ fontSize: '10px', textOverflow: 'hidden' }}>{item.description}</text>}
+                    description={<span style={{ fontSize: '12px', fontFamily: 'consolas', textOverflow: 'hidden' }}>{item.title}</span>}
+                    title={<span style={{ fontSize: '10px', textOverflow: 'hidden' }}>{item.description}</span>}
                 />
             </ui.List.ListItem>
         ));
@@ -86,16 +86,6 @@ export default function () {
             </header>
 
             <main className='main'>
-
-                {/* <ui.StickyTool
-                    style={{ position: 'absolute', top: '0', left: '0', height: "100", width: '200' }}
-                    offset={[-50, -24]}
-                    type='compact'
-                >
-                    <ui.StickyTool.StickyItem label="chat" icon={<icon.ChatIcon />}></ui.StickyTool.StickyItem>
-                    <ui.StickyTool.StickyItem label="add" icon={<icon.AddIcon />}></ui.StickyTool.StickyItem>
-
-                </ui.StickyTool> */}
                 <ui.Space size='mini' style={{ marginBottom: '2px', display: 'flex', justifyContent: 'space-between' }}>
                     <ui.Button size='small' variant="text" shape="square" onClick={uploadFiles} icon={<icon.FileAddFilledIcon />}></ui.Button>
                     <ui.Button size='small' variant="text" shape="square" onClick={uploadFolder} icon={<icon.FolderAddFilledIcon />}></ui.Button>
@@ -105,7 +95,7 @@ export default function () {
                 <ui.List size='small' style={{ height: '34vh', padding: '0 10px', border: '1px solid #c6c6c6', borderRadius: '8px' }} >
                     {renderItems()}
                 </ui.List>
-                <ui.Tabs size='medium' defaultValue='1' >
+                <ui.Tabs size='medium' defaultValue='3' >
                     <ui.Tabs.TabPanel value='1' label='视频切片' children={<VideoSplit list={list} />} />
                     <ui.Tabs.TabPanel value='2' label='添加水印' children={<VideoAddWatermark list={list} />} />
                     <ui.Tabs.TabPanel value='3' label='视频拼接' children={<VideoConcat list={list} />} />

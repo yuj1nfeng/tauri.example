@@ -254,11 +254,13 @@ async function sliceVideo(input, output, opts = {}) {
  * @param {string} [opts.audio_codec='aac'] - 视频编码器
  * @param {number} [opts.crf=23] - 压缩率
  * @param {string} [opts.preset='ultrafast'] - 预设
+ * @param {string} [opts.preset='fps'] -
+ * @param {string} [opts.preset='scale'] - 视频缩放 {width: 1920, height: 1080}
  * @returns {Promise<string>} - 返回拼接后的视频文件绝对路径
  * @throws {Error} - 如果拼接失败，抛出错误
  */
 async function concatVideos(inputs, output, opts = {}) {
-    const { progress_cb = null, video_codec = 'libx264', audio_codec = 'aac', crf = 23, preset = 'ultrafast' } = opts;
+    const { progress_cb = null, scale, fps, video_codec = 'libx264', audio_codec = 'aac', crf = 23, preset = 'ultrafast' } = opts;
     if (inputs.length === 0) throw new Error('没有输入视频文件');
     const list_file = path.join(os.tmpdir(), `${Bun.randomUUIDv7()}.txt`);
     await fs.rm(list_file, { recursive: true, force: true });
@@ -271,19 +273,22 @@ async function concatVideos(inputs, output, opts = {}) {
     cmds.push('-c:v', video_codec);
     cmds.push('-c:a', audio_codec);
     cmds.push('-crf', crf.toString());
+    if (scale) cmds.push('-vf', `scale=${scale.width}:${scale.height}`);
+    if (fps) cmds.push('-r', fps.toString());
     cmds.push('-preset', preset);
     cmds.push(output);
     const proc = Bun.spawn(cmds, { stdout: 'pipe', stderr: 'pipe' });
+    const [progress_stream, err_stream] = proc.stderr.tee();
 
     if (progress_cb != null) {
         const progressHandler = createProgressHandler(progress_cb);
         const duration = (await Promise.all(inputs.map(getVideoDuration))).reduce((sum, duration) => sum + duration, 0);
         progressHandler.setTotalDuration(duration);
-        await proc.stderr.pipeTo(new WritableStream({ write: (chunk) => progressHandler.handleOutput(chunk) }));
+        await progress_stream.pipeTo(new WritableStream({ write: (chunk) => progressHandler.handleOutput(chunk) }));
     }
     await proc.exited;
     if (proc.exitCode !== 0) {
-        const error_output = await new Response(proc.stderr).text();
+        const error_output = await new Response(err_stream).text();
         throw new Error(`FFMPEG处理失败,错误信息:\r\n ${error_output}`);
     }
     return path.resolve(output);

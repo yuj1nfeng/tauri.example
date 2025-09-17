@@ -1,3 +1,5 @@
-.t-form__item {
-  margin-bottom: 6px;
+:root {
+    --td-comp-margin-l: var(--td-size-1);
+    --td-comp-margin-xl: var(--td-size-1);
+    --td-comp-margin-xxl: var(--td-size-1);
 }

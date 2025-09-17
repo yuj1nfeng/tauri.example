@@ -3,6 +3,7 @@ import tauri from './tauri.js';
 import consts from '#consts';
 import kv from './kv.js';
 import task from './task.js';
+import rules from './rules.js';
 
 import playVideo from './ext/play.video.js';
 import captureVideoFrame from './ext/capture.video.frame.js';
@@ -27,5 +28,5 @@ const ext = {
     invoke,
 };
 
-export { task, sse, tauri, ext, consts, kv, videoStore };
-export default { task, sse, tauri, ext, consts, kv, videoStore };
+export { task, sse, tauri, ext, consts, kv, videoStore, rules };
+export default { task, sse, tauri, ext, consts, kv, videoStore, rules };

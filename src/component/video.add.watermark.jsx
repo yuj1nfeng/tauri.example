@@ -1,15 +1,18 @@
 import React from 'react';
-import * as ui from '@arco-design/web-react';
-import utils, { sse, tauri, consts } from '../utils/index.js';
+import * as ui from 'tdesign-react';
+import * as icon from 'tdesign-icons-react';
+import utils, { sse, tauri, consts, rules } from '../utils/index.js';
 import ProgressBtn from './progress.btn.jsx';
 
 const namespace = new URL(import.meta.url).pathname;
 export default function ConcatVideos({ list }) {
     const [state, setState] = React.useState(utils.kv.withNamespace(namespace).get('state'));
+
     const [form] = ui.Form.useForm();
     const init = async () => {
         console.log(namespace + '\tinit');
         setState((prev) => ({ ...prev, 'processing': false, 'percent': 0 }));
+        if (state?.task_id) utils.sse.addEventListener(state.task_id, progressHandle);
         return () => {
             console.log('destory');
         };
@@ -21,72 +24,80 @@ export default function ConcatVideos({ list }) {
 
     const progressHandle = (data) => {
         const percent = Number(data);
-        setState((prev) => ({ ...prev, 'percent': percent }));
+        setState((prev) => ({ ...prev, percent: percent, processing: true }));
         if (parseInt(data) === 100) setState((prev) => ({ ...prev, 'processing': false, percent: 0, task_id: null }));
     };
     const setOutputDir = async (e) => {
         const result = await tauri.dialog.open({ directory: true });
         if (!result) return;
-        form.setFieldValue('output_dir', result.replace(/\\/g, '/'));
+        form.setFieldsValue({ 'output_dir': result.replace(/\\/g, '/') });
     };
 
     const startHandle = async () => {
-        const values = await form.validate();
+        const result = await form.validate();
+        if (result != true) {
+            ui.MessagePlugin.error(result[Object.keys(result)[0]][0].message);
+            return;
+        }
+        const values = form.getFieldsValue(Object.keys(rules.videoAddWatermarkRules));
         setState((prev) => ({ ...prev, 'processing': true, percent: 0 }));
         values['videos'] = list;
-        values['watermark'] = await utils.ext.imageToBase64(values['watermark_files'][0].originFile);
+        values['watermark'] = values['watermark'][0].url;
         const { task_id } = await utils.ext.invoke('video.add.watermark', values);
         setState((prev) => ({ ...prev, 'task_id': task_id }));
         utils.task.createTask(task_id, values, progressHandle);
         sse.addEventListener(consts.events.error, () => setState((prev) => ({ ...prev, 'processing': false, 'percent': 0 })));
     };
 
-    return (
-        <ui.Form {...consts.config.formProps} form={form} initialValues={state?.values} onValuesChange={(_, values) => setState((prev) => ({ ...prev, 'values': values }))}>
-            <ui.Grid.Col span={6}>
-                <ui.Form.Item
-                    rules={[{ required: true, message: '请设置水印图片' }]}
-                    field='watermark_files'
-                    label='水印图片'
-                    children={<ui.Upload multiple={false} limit={1} autoUpload={false} listType='picture-card' />}
-                />
-            </ui.Grid.Col>
-            <ui.Grid.Col span={6}>
-                <ui.Form.Item
-                    rules={[{ required: true, message: '请设置缩放比例' }]}
-                    field='scale'
-                    label='缩放'
-                    children={<ui.InputNumber max={1} min={0.01} step={0.01} style={{ width: '100px' }} />}
-                />
-                <ui.Form.Item
-                    rules={[{ required: true, message: '请设置透明度' }]}
-                    field='opacity'
-                    label='透明'
-                    children={<ui.InputNumber max={1} min={0.1} step={0.1} style={{ width: '100px' }} />}
-                />
-            </ui.Grid.Col>
+    const uploadHandle = async (e) => {
+        console.log(e);
+        const img_url = await utils.ext.imageToBase64(e[0].raw);
+        form.setFieldsValue({ 'watermark': [{ url: img_url }] });
+    };
 
-            <ui.Grid.Col span={12}>
-                <ui.Form.Item
-                    rules={[{ required: true, message: '请设置水印位置' }]}
-                    field='position'
-                    label='水印位置'
-                    children={<ui.Select options={consts.options.watermark_position} autoWidth={{ minWidth: '260px' }} />}
-                />
-                <ui.Form.Item
-                    rules={[{ required: true, message: '请设置视频编码' }]}
-                    field='output_fmt'
-                    label='输出格式'
-                    children={<ui.Select options={consts.options.video_output_fmt} autoWidth={{ minWidth: '260px' }} />}
-                />
-                <ui.Form.Item
-                    rules={[{ required: true, message: '请设置输出目录' }]}
-                    field='output_dir'
-                    label=' 输出目录'
-                    onClick={setOutputDir}
-                    children={<ui.Input autoWidth={{ minWidth: '260px' }} />}
-                />
-            </ui.Grid.Col>
+    return (
+        <ui.Form
+            layout='inline'
+            form={form}
+            colon={true}
+            rules={rules.videoAddWatermarkRules}
+            showErrorMessage={false}
+            initialData={state?.values}
+            style={{ paddingTop: '10px' }}
+            labelWidth={80}
+            onValuesChange={(_, values) => setState((prev) => ({ ...prev, values: values }))
+            }>
+            <ui.Form.FormItem
+                name='scale'
+                label='缩放比例'
+                children={<ui.InputNumber size='small' max={1} min={0.01} step={0.01} style={{ width: '120px' }} />}
+            />
+            <ui.Form.FormItem
+                name='opacity'
+                label='不透明度'
+                children={<ui.InputNumber size='small' max={1} min={0.1} step={0.1} style={{ width: '120px' }} />}
+            />
+            <ui.Form.FormItem
+                name='position'
+                label='水印位置'
+                children={<ui.Select size='small' options={consts.options.watermark_position} style={{ width: '120px' }} />}
+            />
+            <ui.Form.FormItem
+                name='output_fmt'
+                label='输出格式'
+                children={<ui.Select size='small' options={consts.options.video_output_fmt} style={{ width: '120px' }} />}
+            />
+            <ui.Form.FormItem
+                name='watermark'
+                label='水印图片'
+                children={<ui.Upload size='small' theme='image' accept='image/*' imageProps={{ fit: 'contain' }} autoUpload={false} onChange={uploadHandle} />}
+            />
+            <ui.Form.FormItem
+                name='output_dir'
+                label='输出目录'
+                children={<ui.Input size='small' style={{ width: '480px' }} suffixIcon={<icon.FolderSettingFilledIcon cursor='pointer' onClick={setOutputDir} />} />}
+            />
+
             <ProgressBtn
                 onClick={startHandle}
                 size='small'

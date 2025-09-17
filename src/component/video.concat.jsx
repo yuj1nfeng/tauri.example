@@ -1,6 +1,7 @@
 import React from 'react';
-import utils, { tauri, consts, sse } from '../utils/index.js';
-import * as ui from '@arco-design/web-react';
+import utils, { tauri, consts, sse, rules } from '../utils/index.js';
+import * as ui from 'tdesign-react';
+import * as icon from 'tdesign-icons-react';
 import dayjs from 'dayjs';
 import ProgressBtn from './progress.btn.jsx';
 const { options } = consts;
@@ -15,6 +16,7 @@ export default function ConcatVideos({ list }) {
     const init = async () => {
         console.log(namespace + '\tinit');
         setState((prev) => ({ ...prev, 'processing': false, 'percent': 0 }));
+        if (state?.task_id) utils.sse.addEventListener(state.task_id, progressHandle);
         return () => {
             console.log('destory');
         };
@@ -27,7 +29,7 @@ export default function ConcatVideos({ list }) {
 
     const progressHandle = (data) => {
         const percent = Number(data);
-        setState((prev) => ({ ...prev, 'percent': percent }));
+        setState((prev) => ({ ...prev, percent: percent, processing: true }));
         if (parseInt(data) === 100) setState((prev) => ({ ...prev, 'processing': false, percent: 0, task_id: null }));
 
     };
@@ -35,86 +37,82 @@ export default function ConcatVideos({ list }) {
     const setOutputDir = async (e) => {
         const result = await tauri.dialog.open({ directory: true });
         if (!result) return;
-        form.setFieldValue('output_dir', result.replace(/\\/g, '/'));
+        form.setFieldsValue({ 'output_dir': result.replace(/\\/g, '/') });
     };
 
     const startHandle = async () => {
-        const values = await form.validate();
+        const result = await form.validate();
+        if (result != true) {
+            ui.MessagePlugin.error(result[Object.keys(result)[0]][0].message);
+            return;
+        }
+        const values = form.getFieldsValue(Object.keys(rules.videoConcatRules));
         setState((prev) => ({ ...prev, 'processing': true, percent: 0 }));
         values['videos'] = list;
-        const file_name = `${dayjs().format('YYYYMMDDHHmmss')}.CONCAT.${values.output_fmt}`;
+        const file_name = `${dayjs().format('YYYYMMDDHHmmss')}.concat.${values.output_fmt}`;
         values['output_file'] = `${values.output_dir}/${file_name}`;
         const { task_id } = await utils.ext.invoke('video.concat', values);
         setState((prev) => ({ ...prev, 'task_id': task_id }));
         utils.task.createTask(task_id, values, progressHandle);
         sse.addEventListener(consts.events.error, () => setState((prev) => ({ ...prev, 'processing': false, 'percent': 0 })));
     };
-    return (
-        <ui.Form {...consts.config.formProps} form={form} initialValues={state?.values} onValuesChange={(_, values) => setState((prev) => ({ ...prev, 'values': values }))}>
-            <ui.Grid.Col span={8}>
-                <ui.Form.Item
-                    rules={[{ required: true, message: '请设置视频码率' }]}
-                    field='video_bit_rate'
-                    label='视频码率'
-                    children={<ui.Input autoWidth={{ minWidth: '180px' }} />}
-                />
-                <ui.Form.Item
-                    rules={[{ required: true, message: '请设置视频帧率' }]}
-                    field='video_frame_rate'
-                    label='视频帧率'
-                    children={<ui.Input autoWidth={{ minWidth: '180px' }} />}
-                />
-                <ui.Form.Item
-                    rules={[{ required: true, message: '请设置视频编码' }]}
-                    field='video_codec'
-                    label='视频编码'
-                    children={<ui.Select options={options.video_codec} autoWidth={{ minWidth: '180px' }} />}
-                />
-            </ui.Grid.Col>
-            <ui.Grid.Col span={8}>
-                <ui.Form.Item
-                    rules={[{ required: true, message: '请设置画面宽高' }]}
-                    field='video_size'
-                    label='输出大小'
-                    children={<ui.Input autoWidth={{ minWidth: '180px' }} />}
-                />
-                <ui.Form.Item
-                    rules={[{ required: true, message: '请设置输出格式' }]}
-                    field='output_fmt'
-                    label='输出格式'
-                    children={<ui.Select options={options.video_output_fmt} autoWidth={{ minWidth: '180px' }} />}
-                />
-            </ui.Grid.Col>
 
-            <ui.Grid.Col span={8}>
-                <ui.Form.Item
-                    rules={[{ required: true, message: '请设置音频采样率' }]}
-                    field='audio_sample_rate'
-                    label='音频采样率'
-                    children={<ui.Input autoWidth={{ minWidth: '180px' }} />}
-                />
-                <ui.Form.Item
-                    rules={[{ required: true, message: '请设置音频通道数' }]}
-                    field='audio_channels'
-                    label='音频通道数'
-                    children={<ui.InputNumber autoWidth={{ minWidth: '180px' }} />}
-                />
-                <ui.Form.Item
-                    rules={[{ required: true, message: '请设置音频编码器' }]}
-                    field='audio_codec'
-                    label='音频编码器'
-                    children={<ui.Select options={options.audio_codec} autoWidth={{ minWidth: '180px' }} />}
-                />
-            </ui.Grid.Col>
-            <ui.Grid.Col span={24}>
-                <ui.Form.Item
-                    rules={[{ required: true, message: '请设置输出目录' }]}
-                    field='output_dir'
-                    label=' 输出目录'
-                    onClick={setOutputDir}
-                    children={<ui.Input autoWidth={{ minWidth: '260px' }} />}
-                />
-            </ui.Grid.Col>
+
+    return (
+        <ui.Form
+            layout='inline'
+            form={form}
+            colon={true}
+            initialData={state?.values}
+            style={{ paddingTop: '10px' }}
+            rules={rules.videoConcatRules}
+            showErrorMessage={false}
+            labelWidth='100px'
+            onValuesChange={(_, values) => setState((prev) => ({ ...prev, values: values }))
+            }>
+            <ui.Form.FormItem
+                name='fps'
+                label='视频帧率'
+                children={<ui.InputNumber size='small' suffix='FPS' theme="column" style={{ width: '120px' }} />}
+            />
+            <ui.Form.FormItem
+                name='video_codec'
+                label='视频编码器'
+                children={<ui.Select size='small' options={options.video_codec} style={{ width: '120px' }} />}
+            />
+            <ui.Form.FormItem
+                name='audio_codec'
+                label='音频编码器'
+                children={<ui.Select size='small' options={options.audio_codec} style={{ width: '120px' }} />}
+            />
+
+            <ui.Form.FormItem
+                name='output_fmt'
+                label='输出格式'
+                children={<ui.Select size='small' options={options.video_output_fmt} style={{ width: '120px' }} />}
+            />
+
+            <ui.Form.FormItem
+                name='scale_width'
+                label='画面宽度'
+                children={<ui.InputNumber size='small' theme="column" style={{ width: '120px' }} />}
+            />
+
+            <ui.Form.FormItem
+                name='scale_height'
+                label='画面高度'
+                children={<ui.InputNumber size='small' theme="column" style={{ width: '120px' }} />}
+            />
+            <ui.Form.FormItem
+                name='output_dir'
+                label='输出目录'
+                children={<ui.Input
+                    size='small'
+                    placeholder='请选择输出目录'
+                    style={{ width: '364px' }}
+                    suffixIcon={<icon.FolderSettingIcon cursor='pointer' onClick={setOutputDir} />}
+                />}
+            />
             <ProgressBtn
                 onClick={startHandle}
                 size='small'
