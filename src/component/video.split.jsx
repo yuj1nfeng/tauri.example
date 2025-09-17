@@ -57,12 +57,7 @@ export default function ConcatVideos({ list }) {
             labelWidth={80}
             onValuesChange={(_, values) => setState((prev) => ({ ...prev, values: values }))
             }>
-            <ui.Form.FormItem
-                name='split_duration'
-
-                label='切片时长'
-                children={<ui.Slider size='small' style={{ width: '240px' }} />}
-            />
+            <ui.Form.FormItem name='split_duration' label='切片时长' children={<ui.Slider size='small' style={{ width: '240px' }} />} />
 
             <ui.Form.FormItem
                 name='output_dir'

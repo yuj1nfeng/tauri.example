@@ -87,7 +87,7 @@ button.progress-btn.loading .progress-btn__loader {
     left: 0;
     height: 100%;
     z-index: 1;
-    background-color: rgba(255, 255, 255, var(--btn-progress-opacity)); /* 进度条颜色 */
+    background-color: rgba(var(--td-brand-color-8), var(--btn-progress-opacity)); /* 进度条颜色 */
     border-radius: var(--btn-border-radius); /* 继承按钮圆角 */
     transition: width 0.3s ease-out; /* 平滑过渡 */
     transform-origin: left; /* 从左侧开始填充 */

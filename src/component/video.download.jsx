@@ -45,8 +45,7 @@ export default function ConcatVideos({ list }) {
         utils.sse.addEventListener(consts.events.error, () => setState((prev) => ({ ...prev, 'processing': false, 'percent': 0 })));
     };
     return (
-        <ui.Form
-            layout='inline'
+        <ui.Form layout='inline'
             form={form}
             colon={true}
             rules={rules.videoDownloadRules}
@@ -56,16 +55,10 @@ export default function ConcatVideos({ list }) {
             labelWidth={80}
             onValuesChange={(_, values) => setState((prev) => ({ ...prev, values: values }))
             }>
-            <ui.Form.FormItem
-                name='browser'
-                rules={[{ required: true, message: '请设置cookie来源' }]}
-                label='cookie源'
+            <ui.Form.FormItem name='browser' label='cookie源'
                 children={<ui.Select size='small' options={consts.options.browser} style={{ width: '100px' }} />}
             />
-            <ui.Form.FormItem
-                name='output_dir'
-                rules={[{ required: true, message: '请设置输出目录' }]}
-                label='输出目录'
+            <ui.Form.FormItem name='output_dir' label='输出目录'
                 children={<ui.Input
                     size='small'
                     placeholder='请选择输出目录'
@@ -73,10 +66,7 @@ export default function ConcatVideos({ list }) {
                     suffixIcon={<icon.FolderSettingIcon cursor='pointer' onClick={setOutputDir} />}
                 />}
             />
-            <ui.Form.FormItem
-                name='url'
-                rules={[{ required: true, message: '请设置视频链接' }]}
-                label='视频链接'
+            <ui.Form.FormItem name='url' label='视频链接'
                 children={<ui.Input size='small' placeholder='请设置视频链接' style={{ width: '380px' }} />}
             />
             <ProgressBtn

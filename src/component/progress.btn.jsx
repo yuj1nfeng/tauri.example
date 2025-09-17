@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import './progress.btn.css';
+import '../style/progress.btn.css';
 
 const ProgressBtn = ({
     progress = 0,

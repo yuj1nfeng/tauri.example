@@ -70,59 +70,16 @@ export default function ConcatVideos({ list }) {
                 rules={[{ required: true, message: '请设置视频码率' }]}
                 name='split_duration'
                 label='片段时长'
-                children={<ui.Slider
-                    range={true}
-                    min={5} max={60}
-                    style={{ width: '364px' }}
-                />
-                }
+                children={<ui.Slider range={true} min={5} max={60} style={{ width: '364px' }} />}
             />
-
-
+            <ui.Form.FormItem name='fps' label='视频帧率' children={<ui.InputNumber size='small' suffix='FPS' theme="column" style={{ width: '120px' }} />} />
+            <ui.Form.FormItem name='video_codec' label='视频编码' children={<ui.Select options={options.video_codec} size='small' style={{ width: '120px' }} />} />
+            <ui.Form.FormItem name='video_size' label='输出大小' children={<ui.Input size='small' style={{ width: '120px' }} />} />
+            <ui.Form.FormItem name='output_fmt' label='输出格式' children={<ui.Select options={options.video_output_fmt} size='small' style={{ width: '120px' }} />} />
+            <ui.Form.FormItem name='audio_sample_rate' label='音频采样率' children={<ui.Input size='small' style={{ width: '120px' }} />} />
+            <ui.Form.FormItem name='audio_channels' label='音频通道数' children={<ui.InputNumber size='small' style={{ width: '120px' }} />} />
+            <ui.Form.FormItem name='audio_codec' label='音频编码器' children={<ui.Select options={options.audio_codec} size='small' style={{ width: '120px' }} />} />
             <ui.Form.FormItem
-                rules={[{ required: true, message: '请设置视频帧率' }]}
-                name='fps'
-                label='视频帧率'
-                children={<ui.InputNumber size='small' suffix='FPS' theme="column" style={{ width: '120px' }} />}
-            />
-            <ui.Form.FormItem
-                rules={[{ required: true, message: '请设置视频编码' }]}
-                name='video_codec'
-                label='视频编码'
-                children={<ui.Select options={options.video_codec} size='small' style={{ width: '120px' }} />}
-            />
-            <ui.Form.FormItem
-                rules={[{ required: true, message: '请设置画面宽高' }]}
-                name='video_size'
-                label='输出大小'
-                children={<ui.Input size='small' style={{ width: '120px' }} />}
-            />
-            <ui.Form.FormItem
-                rules={[{ required: true, message: '请设置输出格式' }]}
-                name='output_fmt'
-                label='输出格式'
-                children={<ui.Select options={options.video_output_fmt} size='small' style={{ width: '120px' }} />}
-            />
-            <ui.Form.FormItem
-                rules={[{ required: true, message: '请设置音频采样率' }]}
-                name='audio_sample_rate'
-                label='音频采样率'
-                children={<ui.Input size='small' style={{ width: '120px' }} />}
-            />
-            <ui.Form.FormItem
-                rules={[{ required: true, message: '请设置音频通道数' }]}
-                name='audio_channels'
-                label='音频通道数'
-                children={<ui.InputNumber size='small' style={{ width: '120px' }} />}
-            />
-            <ui.Form.FormItem
-                rules={[{ required: true, message: '请设置音频编码器' }]}
-                name='audio_codec'
-                label='音频编码器'
-                children={<ui.Select options={options.audio_codec} size='small' style={{ width: '120px' }} />}
-            />
-            <ui.Form.FormItem
-                rules={[{ required: true, message: '请设置输出目录' }]}
                 name='output_dir'
                 label='输出目录'
                 children={<ui.Input size='small' style={{ width: '480px' }} suffixIcon={<icon.FolderSettingFilledIcon cursor='pointer' onClick={setOutputDir} />} />}

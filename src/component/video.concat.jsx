@@ -70,39 +70,12 @@ export default function ConcatVideos({ list }) {
             labelWidth='100px'
             onValuesChange={(_, values) => setState((prev) => ({ ...prev, values: values }))
             }>
-            <ui.Form.FormItem
-                name='fps'
-                label='视频帧率'
-                children={<ui.InputNumber size='small' suffix='FPS' theme="column" style={{ width: '120px' }} />}
-            />
-            <ui.Form.FormItem
-                name='video_codec'
-                label='视频编码器'
-                children={<ui.Select size='small' options={options.video_codec} style={{ width: '120px' }} />}
-            />
-            <ui.Form.FormItem
-                name='audio_codec'
-                label='音频编码器'
-                children={<ui.Select size='small' options={options.audio_codec} style={{ width: '120px' }} />}
-            />
-
-            <ui.Form.FormItem
-                name='output_fmt'
-                label='输出格式'
-                children={<ui.Select size='small' options={options.video_output_fmt} style={{ width: '120px' }} />}
-            />
-
-            <ui.Form.FormItem
-                name='scale_width'
-                label='画面宽度'
-                children={<ui.InputNumber size='small' theme="column" style={{ width: '120px' }} />}
-            />
-
-            <ui.Form.FormItem
-                name='scale_height'
-                label='画面高度'
-                children={<ui.InputNumber size='small' theme="column" style={{ width: '120px' }} />}
-            />
+            <ui.Form.FormItem name='fps' label='视频帧率' children={<ui.InputNumber size='small' suffix='FPS' theme="column" style={{ width: '120px' }} />} />
+            <ui.Form.FormItem name='video_codec' label='视频编码器' children={<ui.Select size='small' options={options.video_codec} style={{ width: '120px' }} />} />
+            <ui.Form.FormItem name='audio_codec' label='音频编码器' children={<ui.Select size='small' options={options.audio_codec} style={{ width: '120px' }} />} />
+            <ui.Form.FormItem name='output_fmt' label='输出格式' children={<ui.Select size='small' options={options.video_output_fmt} style={{ width: '120px' }} />} />
+            <ui.Form.FormItem name='scale_width' label='画面宽度' children={<ui.InputNumber size='small' theme="column" style={{ width: '120px' }} />} />
+            <ui.Form.FormItem name='scale_height' label='画面高度' children={<ui.InputNumber size='small' theme="column" style={{ width: '120px' }} />} />
             <ui.Form.FormItem
                 name='output_dir'
                 label='输出目录'

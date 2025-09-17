@@ -59,17 +59,8 @@ export default function ({ list }) {
             labelWidth={80}
             onValuesChange={(_, values) => setState((prev) => ({ ...prev, values: values }))
             }>
-            <ui.Form.FormItem
-                name='output_fmt'
-                label='输出格式'
-                children={<ui.Select size='small' style={{ width: '100px' }} options={consts.options.video_output_fmt} />}
-            />
-
-            <ui.Form.FormItem
-                name='output_dir'
-                label='输出目录'
-                children={<ui.Input size='small' style={{ width: '480px' }} suffixIcon={<icon.FolderSettingFilledIcon cursor='pointer' onClick={setOutputDir} />} />}
-            />
+            <ui.Form.FormItem name='output_fmt' label='输出格式' children={<ui.Select size='small' style={{ width: '100px' }} options={consts.options.video_output_fmt} />} />
+            <ui.Form.FormItem name='output_dir' label='输出目录' children={<ui.Input size='small' style={{ width: '480px' }} suffixIcon={<icon.FolderSettingFilledIcon cursor='pointer' onClick={setOutputDir} />} />} />
 
             <ProgressBtn
                 onClick={startHandle}

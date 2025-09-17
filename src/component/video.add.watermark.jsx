@@ -67,36 +67,11 @@ export default function ConcatVideos({ list }) {
             labelWidth={80}
             onValuesChange={(_, values) => setState((prev) => ({ ...prev, values: values }))
             }>
-            <ui.Form.FormItem
-                name='scale'
-                label='缩放比例'
-                children={<ui.InputNumber size='small' max={1} min={0.01} step={0.01} style={{ width: '120px' }} />}
-            />
-            <ui.Form.FormItem
-                name='opacity'
-                label='不透明度'
-                children={<ui.InputNumber size='small' max={1} min={0.1} step={0.1} style={{ width: '120px' }} />}
-            />
-            <ui.Form.FormItem
-                name='position'
-                label='水印位置'
-                children={<ui.Select size='small' options={consts.options.watermark_position} style={{ width: '120px' }} />}
-            />
-            <ui.Form.FormItem
-                name='output_fmt'
-                label='输出格式'
-                children={<ui.Select size='small' options={consts.options.video_output_fmt} style={{ width: '120px' }} />}
-            />
-            <ui.Form.FormItem
-                name='watermark'
-                label='水印图片'
-                children={<ui.Upload size='small' theme='image' accept='image/*' imageProps={{ fit: 'contain' }} autoUpload={false} onChange={uploadHandle} />}
-            />
-            <ui.Form.FormItem
-                name='output_dir'
-                label='输出目录'
-                children={<ui.Input size='small' style={{ width: '480px' }} suffixIcon={<icon.FolderSettingFilledIcon cursor='pointer' onClick={setOutputDir} />} />}
-            />
+            <ui.Form.FormItem name='scale' label='缩放比例' children={<ui.InputNumber size='small' max={1} min={0.01} step={0.01} style={{ width: '120px' }} />} />
+            <ui.Form.FormItem name='opacity' label='不透明度' children={<ui.InputNumber size='small' max={1} min={0.1} step={0.1} style={{ width: '120px' }} />} />            <ui.Form.FormItem name='position' label='水印位置' children={<ui.Select size='small' options={consts.options.watermark_position} style={{ width: '120px' }} />} />
+            <ui.Form.FormItem name='output_fmt' label='输出格式' children={<ui.Select size='small' options={consts.options.video_output_fmt} style={{ width: '120px' }} />} />
+            <ui.Form.FormItem name='watermark' label='水印图片' children={<ui.Upload size='small' theme='image' accept='image/*' imageProps={{ fit: 'contain' }} autoUpload={false} onChange={uploadHandle} />} />
+            <ui.Form.FormItem name='output_dir' label='输出目录' children={<ui.Input size='small' style={{ width: '480px' }} suffixIcon={<icon.FolderSettingFilledIcon cursor='pointer' onClick={setOutputDir} />} />} />
 
             <ProgressBtn
                 onClick={startHandle}

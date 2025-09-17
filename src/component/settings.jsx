@@ -6,16 +6,9 @@ import { useState } from 'react';
 
 export default () => {
     const [visible, setVisible] = useState(false);
-
-
-
     const closeModal = () => {
-
         setVisible(false);
-
     };
-
-
     return (
         <>
             <ui.Button
