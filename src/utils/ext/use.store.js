@@ -34,10 +34,10 @@ export default (db_name = 'db_name', options = { keyPath: 'id', autoIncrement: t
         },
 
         // 添加数据
-        async add(item, key = null) {
+        async add(item) {
             const store = getStore();
-            const id = key || item.id || item.key;
-            const value = { ...item, id: id, key: id };
+            const value = { ...item };
+            console.log('add', value);
             const request = store.add(value);
             // const request = store.add({ value: item, key: key || item.id || item.key });
             const result = await promisifyRequest(request);
@@ -52,11 +52,11 @@ export default (db_name = 'db_name', options = { keyPath: 'id', autoIncrement: t
             return items;
         },
 
-        async get(key) {
+        async get(id) {
             const store = getStore('readonly');
-            const request = store.get(key);
+            const request = store.get(id);
             const result = await promisifyRequest(request);
-            return result.value;
+            return result;
         },
         async update(key, value) {
             const store = getStore('readwrite');

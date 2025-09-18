@@ -50,9 +50,9 @@ export default function () {
         setState((prev) => ({ ...prev, processing: true, percent: 0 }));
         values['videos'] = videos;
         const { task_id } = await utils.ext.invoke('audio.extra', values);
+        await taskService.add({ id: task_id, type: 'audio.extra', values: values }, progressHandle);
         await taskService.add({ task_id: task_id, inputs: values });
         setState((prev) => ({ ...prev, task_id: task_id }));
-        await taskService.add({ id: task_id, values: values }, progressHandle);
         utils.sse.addEventListener(consts.events.error, () => setState((prev) => ({ ...prev, 'processing': false, 'percent': 0 })));
     };
     return (

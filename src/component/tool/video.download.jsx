@@ -43,8 +43,9 @@ export default function ConcatVideos() {
         setState((prev) => ({ ...prev, processing: true, percent: 0 }));
         values['videos'] = await utils.videoStore.getAll();
         const { task_id } = await utils.ext.invoke('video.download', values);
+        await taskService.add({ id: task_id, type: 'video.download', values: values }, progressHandle);
         setState((prev) => ({ ...prev, task_id: task_id }));
-        await taskService.add({ id: task_id, values: values }, progressHandle);
+
         utils.sse.addEventListener(consts.events.error, () => setState((prev) => ({ ...prev, 'processing': false, 'percent': 0 })));
     };
     return (

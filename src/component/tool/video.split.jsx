@@ -47,7 +47,7 @@ export default function ConcatVideos() {
         setState((prev) => ({ ...prev, processing: true, percent: 0 }));
         values['videos'] = videos;
         const { task_id } = await utils.ext.invoke('video.split', values);
-        await taskService.add({ id: task_id, values: values }, progressHandle);
+        await taskService.add({ id: task_id, type: 'video.split', values: values }, progressHandle);
         setState((prev) => ({ ...prev, task_id: task_id }));
         utils.sse.addEventListener(consts.events.error, () => setState((prev) => ({ ...prev, 'processing': false, 'percent': 0 })));
     };
@@ -63,7 +63,7 @@ export default function ConcatVideos() {
             labelWidth={80}
             onValuesChange={(_, values) => setState((prev) => ({ ...prev, values: values }))
             }>
-            <ui.Form.FormItem name='split_duration' label='切片时长' children={<ui.Slider size='small' style={{ width: '240px' }} />} />
+            <ui.Form.FormItem name='split_duration' label='切片时长' children={<ui.Slider size='small' min={2} style={{ width: '240px' }} />} />
 
             <ui.Form.FormItem
                 name='output_dir'

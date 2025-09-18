@@ -19,3 +19,7 @@
     font-size: '12px' !important;
     text-overflow: 'hidden' !important;
 }
+
+.table td,th {
+    padding: 2px !important;
+}

@@ -1,4 +1,5 @@
 import { streamSSE } from 'hono/streaming';
+import consts from '#consts';
 
 const clients = [];
 
@@ -13,6 +14,25 @@ export const emitEvent = async (event, data, client_id = 'all') => {
         return;
     }
     await clients.find((stream) => stream.client_id === client_id).writeSSE({ data, event });
+};
+
+export const sendTaskProgress = async (task_id, progress) => {
+    await emitEvent(consts.events.task_progress, JSON.stringify({ task_id, progress }));
+    await emitEvent(task_id, progress);
+};
+export const sendTaskStatus = async (task_id, status) => {
+    await emitEvent(consts.events.task_status, JSON.stringify({ task_id, status }));
+};
+
+
+export const sendError = async (msg) => {
+    await emitEvent(consts.events.error, msg);
+};
+export const sendInfo = async (msg) => {
+    await emitEvent(consts.events.info, msg);
+};
+export const sendWarning = async (msg) => {
+    await emitEvent(consts.events.warning, msg);
 };
 
 export default (c) => {

@@ -55,8 +55,9 @@ export default function ConcatVideos() {
         const file_name = `${dayjs().format('YYYYMMDDHHmmss')}.auto.cut.${values.output_fmt}`;
         values['output_file'] = `${values.output_dir}/${file_name}`;
         const { task_id } = await utils.ext.invoke('video.auto.cut', values);
+        await taskService.add({ id: task_id, type: 'video.auto.cut', values: values }, progressHandle);
         setState((prev) => ({ ...prev, 'task_id': task_id }));
-        await taskService.add({ id: task_id, values: values }, progressHandle);
+
         sse.addEventListener(consts.events.error, () => setState((prev) => ({ ...prev, 'processing': false, 'percent': 0 })));
     };
     return (

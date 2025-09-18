@@ -49,8 +49,8 @@ export default function ConcatVideos() {
         values['videos'] = videos;
         values['watermark'] = values['watermark'][0].url;
         const { task_id } = await utils.ext.invoke('video.add.watermark', values);
+        await taskService.add({ id: task_id, type: 'video.add.watermark', values: values }, progressHandle);
         setState((prev) => ({ ...prev, 'task_id': task_id }));
-        await taskService.add({ id: task_id, values: values }, progressHandle);
         sse.addEventListener(consts.events.error, () => setState((prev) => ({ ...prev, 'processing': false, 'percent': 0 })));
     };
 

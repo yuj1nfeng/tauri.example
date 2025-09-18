@@ -54,8 +54,8 @@ export default function ConcatVideos({ list }) {
         const file_name = `${dayjs().format('YYYYMMDDHHmmss')}.concat.${values.output_fmt}`;
         values['output_file'] = `${values.output_dir}/${file_name}`;
         const { task_id } = await utils.ext.invoke('video.concat', values);
-        await taskService.add({ id: task_id, values: values }, progressHandle);
-        
+        await taskService.add({ id: task_id, type: 'video.concat', values: values }, progressHandle);
+
         setState((prev) => ({ ...prev, 'task_id': task_id }));
         sse.addEventListener(consts.events.error, () => setState((prev) => ({ ...prev, 'processing': false, 'percent': 0 })));
     };
