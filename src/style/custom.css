@@ -5,3 +5,17 @@
 .t-form__item {
     margin-bottom: 0;
 }
+
+.video-list-item-meta {
+    margin: -10;
+}
+
+.t-list-item__meta-title {
+    font-size: '12px' !important;
+    font-family: 'consolas' !important;
+    text-overflow: 'hidden' !important;
+}
+.video-descriprion {
+    font-size: '12px' !important;
+    text-overflow: 'hidden' !important;
+}

@@ -18,7 +18,7 @@ export default function VideoList() {
         return videos.map((item, index) => (
             <ui.List.ListItem
                 key={item.id}
-                style={{ maxHeight: '48px' }}
+                // style={{ height: '100%' }}
                 action={
                     <ui.Space  >
                         {!!item.thumbnail &&
@@ -26,7 +26,7 @@ export default function VideoList() {
                                 fit='contain'
                                 shape='square'
                                 src={item.thumbnail}
-                                style={{ height: '48px', width: 'auto', cursor: 'pointer', borderRadius: '4px' }}
+                                style={{ height: '100%', width: '48px', cursor: 'pointer', borderRadius: '8px' }}
                                 overlayTrigger='hover'
                                 overlayContent={<icon.PlayCircleIcon color='red' onClick={() => utils.ext.invoke('video.play', { input: item.filename })} />}
                             />}
@@ -34,8 +34,8 @@ export default function VideoList() {
                     </ui.Space>
                 }>
                 <ui.List.ListItemMeta
-                    title={<span style={{ fontSize: '12px', fontFamily: 'consolas', textOverflow: 'hidden' }}>{item.title}</span>}
-                    description={<span style={{ fontSize: '12px', textOverflow: 'hidden' }}>{item.description}</span>}
+                    title={<span className='title' style={{ fontSize: '12px', fontFamily: 'consolas', textOverflow: 'hidden' }}>{item.title}</span>}
+                    description={<span className='description' style={{ fontSize: '12px', textOverflow: 'hidden' }}>{item.description}</span>}
                 />
 
             </ui.List.ListItem>
