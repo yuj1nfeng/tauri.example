@@ -5,10 +5,12 @@ import { useRecoilValue } from 'recoil';
 import videosSelector from '@/store/videos.selector.js';
 import utils, { tauri, consts, rules } from '@/utils/index.js';
 import ProgressBtn from '@/component/progress.btn.jsx';
+import useTaskService from '@/service/task.service.js';
 
 const namespace = new URL(import.meta.url).pathname;
 export default function ConcatVideos() {
     const videos = useRecoilValue(videosSelector);
+    const taskService = useTaskService();
     const [state, setState] = React.useState(utils.kv.withNamespace(namespace).get('state'));
     const [form] = ui.Form.useForm();
     const init = async () => {
@@ -45,8 +47,8 @@ export default function ConcatVideos() {
         setState((prev) => ({ ...prev, processing: true, percent: 0 }));
         values['videos'] = videos;
         const { task_id } = await utils.ext.invoke('video.split', values);
+        await taskService.add({ id: task_id, values: values }, progressHandle);
         setState((prev) => ({ ...prev, task_id: task_id }));
-        utils.task.createTask(task_id, values, progressHandle);
         utils.sse.addEventListener(consts.events.error, () => setState((prev) => ({ ...prev, 'processing': false, 'percent': 0 })));
     };
     return (

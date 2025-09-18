@@ -5,12 +5,14 @@ import { useRecoilValue } from 'recoil';
 import videosSelector from '@/store/videos.selector.js';
 import dayjs from 'dayjs';
 import ProgressBtn from '@/component/progress.btn.jsx';
+import useTaskService from '@/service/task.service.js';
 import utils, { tauri, consts, sse, rules } from '@/utils/index.js';
 
 const { options } = consts;
 
 const namespace = new URL(import.meta.url).pathname;
 export default function ConcatVideos() {
+    const taskService = useTaskService();
     const videos = useRecoilValue(videosSelector);
     const [state, setState] = React.useState(utils.kv.withNamespace(namespace).get('state'));
     const [form] = ui.Form.useForm();
@@ -54,7 +56,7 @@ export default function ConcatVideos() {
         values['output_file'] = `${values.output_dir}/${file_name}`;
         const { task_id } = await utils.ext.invoke('video.auto.cut', values);
         setState((prev) => ({ ...prev, 'task_id': task_id }));
-        utils.task.createTask(task_id, values, progressHandle);
+        await taskService.add({ id: task_id, values: values }, progressHandle);
         sse.addEventListener(consts.events.error, () => setState((prev) => ({ ...prev, 'processing': false, 'percent': 0 })));
     };
     return (

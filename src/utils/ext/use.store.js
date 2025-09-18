@@ -34,9 +34,12 @@ export default (db_name = 'db_name', options = { keyPath: 'id', autoIncrement: t
         },
 
         // 添加数据
-        async add(item) {
+        async add(item, key = null) {
             const store = getStore();
-            const request = store.add({ value: item });
+            const id = key || item.id || item.key;
+            const value = { ...item, id: id, key: id };
+            const request = store.add(value);
+            // const request = store.add({ value: item, key: key || item.id || item.key });
             const result = await promisifyRequest(request);
             return result;
         },
@@ -46,7 +49,7 @@ export default (db_name = 'db_name', options = { keyPath: 'id', autoIncrement: t
             const request = store.getAll();
             const result = await promisifyRequest(request);
             const items = result || [];
-            return items.map((i) => ({ id: i.id || i.key, ...i.value }));
+            return items;
         },
 
         async get(key) {
@@ -55,17 +58,11 @@ export default (db_name = 'db_name', options = { keyPath: 'id', autoIncrement: t
             const result = await promisifyRequest(request);
             return result.value;
         },
-        async put(key, value) {
-            const store = getStore('readwrite');
-            const request = store.put({ key, value });
-            const result = await promisifyRequest(request);
-            return result;
-        },
         async update(key, value) {
             const store = getStore('readwrite');
             let result = await promisifyRequest(store.get(key));
-            const new_value = { ...result.value, ...value };
-            result = await promisifyRequest(store.put({ key, value: new_value }));
+            const new_value = { ...result, ...value };
+            result = await promisifyRequest(store.put(new_value));
             return result;
         },
         async delete(key) {

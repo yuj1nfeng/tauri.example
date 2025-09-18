@@ -3,11 +3,13 @@ import * as ui from 'tdesign-react';
 import * as icon from 'tdesign-icons-react';
 import { useRecoilValue } from 'recoil';
 import videosSelector from '@/store/videos.selector.js';
+import useTaskService from '@/service/task.service.js';
 import utils, { sse, tauri, consts, rules } from '@/utils/index.js';
 import ProgressBtn from '@/component/progress.btn.jsx';
 
 const namespace = new URL(import.meta.url).pathname;
 export default function ConcatVideos() {
+    const taskService = useTaskService();
     const videos = useRecoilValue(videosSelector);
     const [state, setState] = React.useState(utils.kv.withNamespace(namespace).get('state'));
 
@@ -48,7 +50,7 @@ export default function ConcatVideos() {
         values['watermark'] = values['watermark'][0].url;
         const { task_id } = await utils.ext.invoke('video.add.watermark', values);
         setState((prev) => ({ ...prev, 'task_id': task_id }));
-        utils.task.createTask(task_id, values, progressHandle);
+        await taskService.add({ id: task_id, values: values }, progressHandle);
         sse.addEventListener(consts.events.error, () => setState((prev) => ({ ...prev, 'processing': false, 'percent': 0 })));
     };
 

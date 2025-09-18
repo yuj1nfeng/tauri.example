@@ -1,29 +1,27 @@
-
 import { useRecoilState } from 'recoil';
-import videosStore from '../store/videos.atom.js';
+import videosAtom from '../store/videos.atom.js';
 import utils from '../utils/index.js';
-
 
 export default useVideoService;
 
 function useVideoService() {
-    const [videos, setVideos] = useRecoilState(videosStore);
+    const [videos, setVideos] = useRecoilState(videosAtom);
     const init = async () => {
-        const list = await utils.videoStore.getAll();
+        const list = await utils.store.videos.getAll();
         setVideos(list);
     };
     const add = async (video) => {
-        video.id = await utils.videoStore.add(video);
+        video.id = await utils.store.videos.add(video);
         setVideos((prev) => [...prev, video]);
     };
     const remove = async (id) => {
-        await utils.videoStore.delete(id);
-        const list = await utils.videoStore.getAll();
+        await utils.store.videos.delete(id);
+        const list = await utils.store.videos.getAll();
         setVideos(list);
         // setVideos((prev) => prev.filter((v) => v.id !== id));
     };
     const removeAll = async () => {
-        await utils.videoStore.clear();
+        await utils.store.videos.clear();
         setVideos([]);
     };
     const addList = async (files) => {
@@ -52,4 +50,3 @@ function useVideoService() {
     };
     return { init, add, remove, removeAll, addList, uploadFiles, uploadFolder };
 }
-

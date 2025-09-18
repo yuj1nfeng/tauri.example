@@ -3,8 +3,11 @@ import utils, { tauri, consts, rules, sse } from '@/utils/index.js';
 import * as ui from 'tdesign-react';
 import * as icon from 'tdesign-icons-react';
 import ProgressBtn from '@/component/progress.btn.jsx';
+import useTaskService from '@/service/task.service.js';
+
 const namespace = new URL(import.meta.url).pathname;
 export default function ConcatVideos() {
+    const taskService = useTaskService();
     const [state, setState] = React.useState(utils.kv.withNamespace(namespace).get('state'));
     const [form] = ui.Form.useForm();
     const init = async () => {
@@ -41,7 +44,7 @@ export default function ConcatVideos() {
         values['videos'] = await utils.videoStore.getAll();
         const { task_id } = await utils.ext.invoke('video.download', values);
         setState((prev) => ({ ...prev, task_id: task_id }));
-        utils.task.createTask(task_id, values, progressHandle);
+        await taskService.add({ id: task_id, values: values }, progressHandle);
         utils.sse.addEventListener(consts.events.error, () => setState((prev) => ({ ...prev, 'processing': false, 'percent': 0 })));
     };
     return (
