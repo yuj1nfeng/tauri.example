@@ -6,7 +6,7 @@ import TaskList from '@/component/task.list.jsx';
 export default function () {
     return (
         <RecoilRoot >
-            <main className='p-2' style={{ height: '90vh', overflow: 'auto' }}>
+            <main style={{ height: '90vh', overflow: 'auto' }}>
                 <Actions />
                 <VideoList style={{ height: 220, fontSize: 12 }} />
                 <TaskList style={{ height: 220, fontSize: 12 }} />

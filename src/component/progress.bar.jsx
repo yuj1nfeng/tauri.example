@@ -1,196 +1,94 @@
-import React from 'react';
-import '@/style/progress.bar.css';
+import React, { useState, useEffect } from 'react';
 
-const ProgressBar = ({
-    value = 0,
-    max = 100,
-    size = 'medium',
-    variant = 'primary',
-    showLabel = false,
-    showPercentage = true,
-    animated = false,
-    striped = true,
-    label = '',
-    className = '',
-    style = {},
-    onComplete = null,
-    duration = 100,
-    autoIncrement = false,
-    incrementSpeed = 20
+export default ({
+    percentage = 0,
+    height = '36px',
+    bgColor = 'bg-gray-200',
+    progressColor = 'bg-blue-800',
+    borderRadius = '0.3rem',
+    animationDuration = 800,
+    stripeAnimationDuration = 1500,
+    textColor = 'text-white'
 }) => {
-    const [currentValue, setCurrentValue] = React.useState(0);
-    const [isAnimating, setIsAnimating] = React.useState(false);
+    const [progress, setProgress] = useState(0);
+    // 跟踪是否应该播放动画
+    const [isAnimating, setIsAnimating] = useState(true);
 
-    // 计算百分比
-    const percentage = Math.min(Math.max((currentValue / max) * 100, 0), 100);
-    // const displayPercentage = Math.round(percentage);
-    const displayPercentage = percentage.toFixed(2);
+    // 进度更新动画
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            const newProgress = Math.max(0, Math.min(100, percentage));
+            setProgress(newProgress);
+            // 当进度达到100%时停止动画
+            setIsAnimating(newProgress < 100);
+        }, 50);
 
-    // 动画效果
-    React.useEffect(() => {
-        if (animated && value !== currentValue) {
-            setIsAnimating(true);
-            const startValue = currentValue;
-            const endValue = value;
-            const startTime = Date.now();
+        return () => clearTimeout(timer);
+    }, [percentage]);
 
-            const animate = () => {
-                const elapsed = Date.now() - startTime;
-                const progress = Math.min(elapsed / duration, 1);
+    // 动态文本颜色
+    const getTextColor = () => {
+        return progress < 15 ? 'text-gray-700' : textColor;
+    };
 
-                // 使用缓动函数
-                const easeOutCubic = 1 - Math.pow(1 - progress, 3);
-                const newValue = startValue + (endValue - startValue) * easeOutCubic;
-
-                setCurrentValue(newValue);
-
-                if (progress < 1) {
-                    requestAnimationFrame(animate);
-                } else {
-                    setCurrentValue(endValue);
-                    setIsAnimating(false);
-                    if (endValue >= max && onComplete) {
-                        onComplete();
-                    }
-                }
-            };
-
-            requestAnimationFrame(animate);
-        } else {
-            setCurrentValue(value);
-        }
-    }, [value, animated, duration, max, onComplete, currentValue]);
-
-    // 自动递增
-    React.useEffect(() => {
-        if (autoIncrement && currentValue < max) {
-            const timer = setInterval(() => {
-                setCurrentValue(prev => {
-                    const newValue = Math.min(prev + 1, max);
-                    if (newValue >= max && onComplete) {
-                        onComplete();
-                    }
-                    return newValue;
-                });
-            }, incrementSpeed);
-
-            return () => clearInterval(timer);
-        }
-    }, [autoIncrement, currentValue, max, incrementSpeed, onComplete]);
-
-    const progressClasses = [
-        'progress-bar',
-        `progress-bar--${size}`,
-        `progress-bar--${variant}`,
-        striped && 'progress-bar--striped',
-        animated && 'progress-bar--animated',
-        isAnimating && 'progress-bar--animating',
-        className
-    ].filter(Boolean).join(' ');
+    // 计算文字尺寸
+    const getTextStyle = () => {
+        const heightValue = parseFloat(height);
+        const lineHeight = `${heightValue * 0.95}px`;
+        const fontSize = `${heightValue * 0.65}px`;
+        return { lineHeight, fontSize };
+    };
 
     return (
-        <div className={progressClasses} style={style}>
-            {(showLabel && label) && (
-                <div className="progress-bar__label">
-                    {label}
-                </div>
-            )}
+        <>
+            {/* 动画关键帧定义 */}
+            <style>
+                {`
+                    @keyframes stripeAnimation {
+                        0% { background-position: 20px 0; }
+                        100% { background-position: 0 0; }
+                    }
+                    
+                    .stripe-animate {
+                        animation: stripeAnimation ${stripeAnimationDuration}ms linear infinite;
+                    }
+                `}
+            </style>
 
-            <div className="progress-bar__container">
+            <div
+                className={`w-full overflow-hidden ${bgColor} rounded-lg relative`}
+                style={{ height, borderRadius }}
+            >
+                {/* 进度条填充部分 */}
                 <div
-                    className="progress-bar__fill"
-                    style={{ width: `${percentage}%` }}
-                >
-                    {striped && <div className="progress-bar__stripes" />}
-                </div>
-
-                {showPercentage && (
-                    <div className="progress-bar__percentage">
-                        {displayPercentage}%
-                    </div>
-                )}
-            </div>
-
-            {showLabel && !label && (
-                <div className="progress-bar__info">
-                    {currentValue.toFixed(0)} / {max}
-                </div>
-            )}
-        </div>
-    );
-};
-
-// 预设的进度条变体
-export const CircularProgress = ({
-    value = 0,
-    max = 100,
-    size = 120,
-    strokeWidth = 8,
-    variant = 'primary',
-    showPercentage = true,
-    animated = true,
-    className = '',
-    style = {}
-}) => {
-    const [currentValue, setCurrentValue] = React.useState(0);
-
-    React.useEffect(() => {
-        if (animated) {
-            const timer = setTimeout(() => setCurrentValue(value), 100);
-            return () => clearTimeout(timer);
-        } else {
-            setCurrentValue(value);
-        }
-    }, [value, animated]);
-
-    const percentage = Math.min(Math.max((currentValue / max) * 100, 0), 100);
-    const radius = (size - strokeWidth) / 2;
-    const circumference = radius * 2 * Math.PI;
-    const strokeDasharray = circumference;
-    const strokeDashoffset = circumference - (percentage / 100) * circumference;
-
-    return (
-        <div
-            className={`circular-progress circular-progress--${variant} ${className}`}
-            style={{ width: size, height: size, ...style }}
-        >
-            <svg width={size} height={size}>
-                {/* 背景圆环 */}
-                <circle
-                    cx={size / 2}
-                    cy={size / 2}
-                    r={radius}
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth={strokeWidth}
-                    className="circular-progress__background"
-                />
-                {/* 进度圆环 */}
-                <circle
-                    cx={size / 2}
-                    cy={size / 2}
-                    r={radius}
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth={strokeWidth}
-                    strokeDasharray={strokeDasharray}
-                    strokeDashoffset={strokeDashoffset}
-                    strokeLinecap="round"
-                    className="circular-progress__fill"
+                    className={`${progressColor} transition-all ease-out relative overflow-hidden`}
                     style={{
-                        transition: animated ? 'stroke-dashoffset 0.5s ease-in-out' : 'none',
-                        transform: 'rotate(-90deg)',
-                        transformOrigin: '50% 50%'
+                        width: `${progress}%`,
+                        height: '100%',
+                        transitionDuration: `${animationDuration}ms`,
+                        borderRadius
                     }}
-                />
-            </svg>
-            {showPercentage && (
-                <div className="circular-progress__percentage">
-                    {Math.round(percentage)}%
+                >
+                    {/* 条纹动画层 - 仅在isAnimating为true时应用动画类 */}
+                    <div
+                        className={`absolute inset-0 bg-white/20 ${isAnimating ? 'stripe-animate' : ''}`}
+                        style={{
+                            backgroundImage: 'linear-gradient(45deg, rgba(255,255,255,.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,.15) 50%, rgba(255,255,255,.15) 75%, transparent 75%, transparent)',
+                            backgroundSize: '20px 20px'
+                        }}
+                    />
                 </div>
-            )}
-        </div>
+
+                {/* 中间百分比文本 */}
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <span
+                        className={`font-semibold ${getTextColor()}`}
+                        style={getTextStyle()}
+                    >
+                        {progress}%
+                    </span>
+                </div>
+            </div>
+        </>
     );
 };
-
-export default ProgressBar;

@@ -7,58 +7,61 @@ import * as ui from 'tdesign-react';
 import * as icon from 'tdesign-icons-react';
 import utils from '@/utils/index.js';
 import useTaskService from '@/service/task.service.js';
-import ProgressBar from '@/component/progress.bar';
+import ProgressBar from '@/component/progress.bar.jsx';
 
 
 export default function ({ style = {} }) {
     const tasks = useRecoilValue(tasksSorted);
     const taskService = useTaskService();
     React.useEffect(() => taskService.init, []);
+    const tag = (text, color = 'primary') => {
+        return <span className={`text-${color}-500 inline-flex items-center px-2 py-0.5 rounded-md bg-gray-100 `}>{text}</span>;
+    };
 
+    const typeTagMap = {
+        'video.split': '视频分割',
+        'video.concat': '视频合并',
+        'video.add.watermark': '添加水印',
+        'video.add.subtitle': '添加字幕',
+        'audio.extra': '音频提取',
+        'audio.remove': '音频去除',
+        'video.auto.cut': '自动分割',
+        'video.download': '下载视频'
+    };
+    const statusTagMap = {
+        'created': '已创建',
+        'running': '运行中',
+        'completed': '已完成',
+        'failed': '失败',
+        'cancelled': '已取消',
+    };
 
     const renderTaskType = ({ row }) => {
         const { type } = row;
-        switch (type) {
-            case 'video.split':
-                return <ui.Tag size='small'>{'视频切片'}</ui.Tag>;
-            case 'video.concat':
-                return <ui.Tag size='small'>{'视频合并'}</ui.Tag>;
-            case 'video.add.watermark':
-                return <ui.Tag size='small'>{'添加水印'}</ui.Tag>;
-            case 'video.add.subtitle':
-                return <ui.Tag size='small'>{'添加字幕'}</ui.Tag>;
-            case 'audio.extra':
-                return <ui.Tag size='small'>{'音频提取'}</ui.Tag>;
-            case 'audio.remove':
-                return <ui.Tag size='small'>{'音频去除'}</ui.Tag>;
-            case 'video.auto.cut':
-                return <ui.Tag size='small'>{'自动混剪'}</ui.Tag>;
-            case 'video.download':
-                return <ui.Tag size='small'>{'视频下载'}</ui.Tag>;
-            default:
-                return '未知';
-        }
+        const tagText = typeTagMap[type];
+        return tagText ? tag(tagText) : '未知';
     };
     const renderTaskStatus = ({ row }) => {
         const { status } = row;
         switch (status) {
             case 'created':
-                return <ui.Tag size='small'>{'已创建'}</ui.Tag>;
+                return tag('已创建', 'gray');
             case 'running':
-                return <ui.Tag size='small'>{'运行中'}</ui.Tag>;
+                return tag('运行中', 'blue');
             case 'completed':
-                return <ui.Tag size='small'>{'已完成'}</ui.Tag>;
-            case 'finished':
-                return <ui.Tag size='small'>{'已完成'}</ui.Tag>;
+                return tag('已完成', 'green');
+            case 'failed':
+                return tag('失败', 'red');
+            case 'cancelled':
+                return tag('已取消', 'gray');
             default:
-                return <ui.Tag size='small'>{'未知'}</ui.Tag>;
+                return '未知';
         }
     };
 
     const renderTaskProgress = ({ row }) => {
         const { progress } = row;
-        return <ProgressBar value={progress} animated variant="purple" style={{ width: 120, margin: 0 }} />;
-        // return <ui.Progress style={{ width: 120 }} percentage={row.progress} />;
+        return <ProgressBar percentage={progress} height='14px' />;
     };
     const columns = [
         { colKey: 'id', title: '任务ID', },

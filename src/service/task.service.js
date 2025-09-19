@@ -13,7 +13,7 @@ function useTaskService() {
         utils.sse.addEventListener(utils.consts.events.task_progress, async function (data) {
             const { task_id, progress } = JSON.parse(data);
 
-            console.log(utils.consts.events.task_progress, task_id, progress);
+            // console.log(utils.consts.events.task_progress, task_id, progress);
             await updateTaskProgress(task_id, Number(progress));
         });
     };

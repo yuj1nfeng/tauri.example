@@ -1,3 +1,5 @@
+@import "tailwindcss";
+
 :root {
     --td-comp-margin-l: var(--td-size-1);
 }
