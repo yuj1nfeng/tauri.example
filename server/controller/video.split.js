@@ -1,4 +1,5 @@
 import ffmpeg from '../utils/ffmpeg.js';
+import random from '../utils/random.js';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import * as sse from '../middleware/sse.js';
@@ -9,7 +10,7 @@ export default async (ctx) => {
     const body = await ctx.req.json();
     const { videos, output_dir, split_duration } = body;
     if (!(await fs.exists(output_dir))) await fs.mkdir(output_dir, { recursive: true, force: true });
-    const task_id = dayjs().format('YYYYMMDDHHmmss') + Math.floor(Math.random() * 1000);
+    const task_id = random.createTaskId();
     ctx.set('task_id', task_id);
     const total_duration = videos.map((p) => Number(p.duration)).reduce((a, b) => a + b, 0);
     let handled = 0;
@@ -50,7 +51,7 @@ export default async (ctx) => {
             await sse.sendTaskStatus(task_id, 'completed');
         } catch (error) {
             await sse.sendError(error.message);
-            await sse.sendTaskStatus(task_id, 'finished');
+            await sse.sendTaskStatus(task_id, 'failed');
         } finally {
             await sse.sendInfo('处理完成');
         }

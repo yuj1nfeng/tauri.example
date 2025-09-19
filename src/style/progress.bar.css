@@ -1,0 +1,194 @@
+/* 线性进度条样式 */
+.progress-bar {
+  width: 100%;
+  margin: 16px 0;
+}
+
+.progress-bar__label {
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+}
+
+.progress-bar__container {
+  position: relative;
+  background-color: #f3f4f6;
+  border-radius: 9999px;
+  overflow: hidden;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.progress-bar__fill {
+  height: 100%;
+  border-radius: 9999px;
+  position: relative;
+  transition: width 0.3s ease-in-out;
+  overflow: hidden;
+}
+
+.progress-bar__percentage {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 12px;
+  font-weight: 600;
+  color: white;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  z-index: 2;
+}
+
+.progress-bar__info {
+  margin-top: 4px;
+  font-size: 12px;
+  color: #6b7280;
+  text-align: right;
+}
+
+/* 尺寸变体 */
+.progress-bar--small .progress-bar__container {
+  height: 6px;
+}
+
+.progress-bar--small .progress-bar__percentage {
+  font-size: 10px;
+}
+
+.progress-bar--medium .progress-bar__container {
+  height: 12px;
+}
+
+.progress-bar--large .progress-bar__container {
+  height: 20px;
+}
+
+.progress-bar--large .progress-bar__percentage {
+  font-size: 14px;
+}
+
+/* 颜色变体 */
+.progress-bar--primary .progress-bar__fill {
+  background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+}
+
+.progress-bar--success .progress-bar__fill {
+  background: linear-gradient(90deg, #10b981, #059669);
+}
+
+.progress-bar--warning .progress-bar__fill {
+  background: linear-gradient(90deg, #f59e0b, #d97706);
+}
+
+.progress-bar--error .progress-bar__fill {
+  background: linear-gradient(90deg, #ef4444, #dc2626);
+}
+
+.progress-bar--info .progress-bar__fill {
+  background: linear-gradient(90deg, #06b6d4, #0891b2);
+}
+
+.progress-bar--purple .progress-bar__fill {
+  background: linear-gradient(90deg, #8b5cf6, #7c3aed);
+}
+
+/* 条纹效果 */
+.progress-bar--striped .progress-bar__stripes {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: linear-gradient(
+    45deg,
+    rgba(255, 255, 255, 0.15) 25%,
+    transparent 25%,
+    transparent 50%,
+    rgba(255, 255, 255, 0.15) 50%,
+    rgba(255, 255, 255, 0.15) 75%,
+    transparent 75%,
+    transparent
+  );
+  background-size: 16px 16px;
+}
+
+.progress-bar--animated .progress-bar__stripes {
+  animation: progress-stripes 1s linear infinite;
+}
+
+@keyframes progress-stripes {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 16px 0;
+  }
+}
+
+/* 动画效果 */
+.progress-bar--animating .progress-bar__fill {
+  transition: width 0.1s ease-out;
+}
+
+/* 圆形进度条样式 */
+.circular-progress {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.circular-progress__background {
+  opacity: 0.2;
+}
+
+.circular-progress__fill {
+  opacity: 1;
+}
+
+.circular-progress__percentage {
+  position: absolute;
+  font-size: 16px;
+  font-weight: 600;
+  color: #374151;
+}
+
+/* 圆形进度条颜色变体 */
+.circular-progress--primary {
+  color: #3b82f6;
+}
+
+.circular-progress--success {
+  color: #10b981;
+}
+
+.circular-progress--warning {
+  color: #f59e0b;
+}
+
+.circular-progress--error {
+  color: #ef4444;
+}
+
+.circular-progress--info {
+  color: #06b6d4;
+}
+
+.circular-progress--purple {
+  color: #8b5cf6;
+}
+
+/* 响应式设计 */
+@media (max-width: 640px) {
+  .progress-bar__percentage {
+    font-size: 10px;
+  }
+  
+  .progress-bar--large .progress-bar__percentage {
+    font-size: 12px;
+  }
+  
+  .circular-progress__percentage {
+    font-size: 14px;
+  }
+}

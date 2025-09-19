@@ -33,21 +33,34 @@ function useTaskService() {
         setTasks(list);
         listenTaskStatus();
         listenTaskProgress();
-
     };
-    const add = async (task, progress_callback) => {
+
+    const create = async (type, values, progress_callback) => {
+        const { task_id } = await utils.ext.invoke(type, values);
+        const task = { type, values };
+        task.id = task_id;
         task.create_time = dayjs().format('YYYY-MM-DD HH:mm:ss');
         task.status = 'created';
         task.progress = 0;
         await utils.store.tasks.add(task);
         setTasks((prev) => [...prev, task]);
         const { id } = task;
-        utils.sse.addEventListener(id, async function (data) {
+        const callback = async (data) => {
             progress_callback && progress_callback(data);
             await updateTaskProgress(id, Number(data));
             if (parseInt(data) != 100) return;
-            utils.sse.removeEventListener(id, this);
-        });
+            utils.sse.removeEventListener(id, callback);
+        };
+        utils.sse.addEventListener(id, callback);
+        return task_id;
+    };
+    const retry = async (id) => {
+        const task = await utils.store.tasks.get(id);
+        if (!task) return;
+        console.log('retry', task);
+        await remove(id);
+        const task_id = await create(task.type, task.values);
+        return task_id;
     };
     const remove = async (id) => {
         await utils.store.tasks.delete(id);
@@ -73,5 +86,5 @@ function useTaskService() {
         await utils.store.tasks.update(id, new_task);
         setTasks((prev) => prev.map((t) => (t.id === id ? new_task : t)));
     };
-    return { init, add, remove, removeAll, updateTaskProgress, updateTaskStatus };
+    return { init, create, retry, remove, removeAll, updateTaskProgress, updateTaskStatus };
 }

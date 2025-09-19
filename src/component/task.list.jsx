@@ -7,6 +7,7 @@ import * as ui from 'tdesign-react';
 import * as icon from 'tdesign-icons-react';
 import utils from '@/utils/index.js';
 import useTaskService from '@/service/task.service.js';
+import ProgressBar from '@/component/progress.bar';
 
 
 export default function ({ style = {} }) {
@@ -56,19 +57,20 @@ export default function ({ style = {} }) {
 
     const renderTaskProgress = ({ row }) => {
         const { progress } = row;
-        return <ui.Progress style={{ width: 120 }} size='small' percentage={progress} />;
+        return <ProgressBar value={progress} animated variant="purple" style={{ width: 120, margin: 0 }} />;
+        // return <ui.Progress style={{ width: 120 }} percentage={row.progress} />;
     };
     const columns = [
         { colKey: 'id', title: '任务ID', },
         { colKey: 'type', title: '任务类型', cell: renderTaskType },
         { colKey: 'create_time', title: '创建时间', },
-        { colKey: 'progress', title: '任务进度', cell: ({ row }) => <ui.Progress style={{ width: 120 }} percentage={row.progress} /> },
+        { colKey: 'progress', title: '任务进度', cell: renderTaskProgress },
         { colKey: 'status', title: '任务状态', cell: renderTaskStatus },
         {
             colKey: 'options', title: '操作', fixed: 'right', cell: ({ row }) =>
                 <ui.Space size='small' align='end'>
                     <ui.Button variant="text" shape="square" size='small' icon={<icon.DownloadIcon />} />
-                    <ui.Button variant="text" shape="square" size='small' icon={<icon.RefreshIcon />} />
+                    <ui.Button variant="text" shape="square" size='small' icon={<icon.RefreshIcon onClick={() => taskService.retry(row.id)} />} />
                     <ui.Button variant="text" shape="square" size='small' icon={<icon.Delete1FilledIcon onClick={() => taskService.remove(row.id)} />} />
                 </ui.Space>
         }

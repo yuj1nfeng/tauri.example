@@ -49,7 +49,7 @@ export function VideoList({ style = {} }) {
 }
 
 
-export default function ({ style = {} }) {
+export default function VideoTable({ style = {} }) {
     const [videos] = useRecoilState(videosStore);
     const videoService = useVideoService();
     React.useEffect(() => videoService.init, []);
@@ -69,7 +69,7 @@ export default function ({ style = {} }) {
     };
 
     const columns = [
-        { colKey: 'filename', title: '文件名', cell: renderImg },
+        { colKey: 'filename', title: '文件名', cell: renderImg, width: 120 },
         { colKey: 'filename', title: '文件名', ellipsis: true },
         { colKey: 'fmt_size', title: '文件大小', },
         { colKey: 'video.codec', title: '视频编码', },

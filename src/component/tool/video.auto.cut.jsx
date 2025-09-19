@@ -48,14 +48,12 @@ export default function ConcatVideos() {
             ui.MessagePlugin.error(result[Object.keys(result)[0]][0].message);
             return;
         }
-        const values = form.getFieldsValue([...Object.keys(rules.videoAutoCutRules), 'video_width', 'video_height']);
-        console.log(values);
+        const values = form.getFieldsValue([...Object.keys(rules.videoAutoCutRules)]);
         setState((prev) => ({ ...prev, 'processing': true, percent: 0 }));
         values['videos'] = videos;
         const file_name = `${dayjs().format('YYYYMMDDHHmmss')}.auto.cut.${values.output_fmt}`;
         values['output_file'] = `${values.output_dir}/${file_name}`;
-        const { task_id } = await utils.ext.invoke('video.auto.cut', values);
-        await taskService.add({ id: task_id, type: 'video.auto.cut', values: values }, progressHandle);
+        const task_id = await taskService.create('video.auto.cut', values, progressHandle);
         setState((prev) => ({ ...prev, 'task_id': task_id }));
 
         sse.addEventListener(consts.events.error, () => setState((prev) => ({ ...prev, 'processing': false, 'percent': 0 })));

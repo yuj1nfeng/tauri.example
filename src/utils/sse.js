@@ -17,7 +17,7 @@ function getEventSource() {
     source.addEventListener(consts.events.error, (event) => ui.MessagePlugin.error(event.data));
     source.addEventListener(consts.events.warning, (event) => ui.MessagePlugin.warning(event.data));
     source.addEventListener(consts.events.info, (event) => ui.MessagePlugin.info(event.data));
-    source.addEventListener(consts.events.heartbeat, (event) => console.log('heartbeat', event.data));
+    source.addEventListener(consts.events.heartbeat, (event) => localStorage.setItem('heartbeat', event.data));
     return source;
 }
 
@@ -30,6 +30,7 @@ function addEventListener(type, callback) {
 }
 
 function removeEventListener(type, callback) {
+    console.log('remove.event.listener', type, callback);
     getEventSource().removeEventListener(type, callback);
 }
 

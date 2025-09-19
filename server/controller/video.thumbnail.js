@@ -7,5 +7,4 @@ export default async (ctx) => {
     if (!stat.isFile()) return ctx.text('');
     const result = await ffmpeg.generateThumbnail(input);
     return ctx.json(result);
-    // return ctx.json({ result });
 };

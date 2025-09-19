@@ -47,8 +47,7 @@ export default function () {
         const values = form.getFieldsValue(Object.keys(rules.audioRemoveRules));
         setState((prev) => ({ ...prev, processing: true, percent: 0 }));
         values['videos'] = videos;
-        const { task_id } = await utils.ext.invoke('audio.remove', values);
-        await taskService.add({ id: task_id, type: 'audio.remove', values: values }, progressHandle);
+        const task_id = await taskService.create('audio.remove', values, progressHandle);
         setState((prev) => ({ ...prev, task_id: task_id }));
         utils.sse.addEventListener(consts.events.error, () => setState((prev) => ({ ...prev, 'processing': false, 'percent': 0 })));
     };
