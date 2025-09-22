@@ -2,12 +2,16 @@ import React from 'react';
 import utils, { tauri, consts, rules, sse } from '@/utils/index.js';
 import * as ui from 'tdesign-react';
 import * as icon from 'tdesign-icons-react';
+import { useRecoilValue } from 'recoil';
+import videosSelector from '@/store/videos.selector.js';
 import ProgressBtn from '@/component/progress.btn.jsx';
 import useTaskService from '@/service/task.service.js';
 
 const namespace = new URL(import.meta.url).pathname;
 export default function ConcatVideos() {
     const taskService = useTaskService();
+
+    const videos = useRecoilValue(videosSelector);
     const [state, setState] = React.useState(utils.kv.withNamespace(namespace).get('state'));
     const [form] = ui.Form.useForm();
     const init = async () => {
@@ -41,7 +45,7 @@ export default function ConcatVideos() {
         }
         const values = form.getFieldsValue(Object.keys(rules.videoDownloadRules));
         setState((prev) => ({ ...prev, processing: true, percent: 0 }));
-        values['videos'] = await utils.videoStore.getAll();
+        values['videos'] = videos;
         const task_id = await taskService.create('video.download', values, progressHandle);
         setState((prev) => ({ ...prev, task_id: task_id }));
 
